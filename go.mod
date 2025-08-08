@@ -1,4 +1,4 @@
-module github.com/Amierza/go-boiler-plate
+module github.com/Amierza/nawasena-backend
 
 go 1.23.2
 

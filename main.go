@@ -4,14 +4,14 @@ import (
 	"log"
 	"os"
 
-	"github.com/Amierza/go-boiler-plate/cmd"
-	"github.com/Amierza/go-boiler-plate/config/database"
-	"github.com/Amierza/go-boiler-plate/handler"
-	"github.com/Amierza/go-boiler-plate/jwt"
-	"github.com/Amierza/go-boiler-plate/middleware"
-	"github.com/Amierza/go-boiler-plate/repository"
-	"github.com/Amierza/go-boiler-plate/routes"
-	"github.com/Amierza/go-boiler-plate/service"
+	"github.com/Amierza/nawasena-backend/cmd"
+	"github.com/Amierza/nawasena-backend/config/database"
+	"github.com/Amierza/nawasena-backend/handler"
+	"github.com/Amierza/nawasena-backend/jwt"
+	"github.com/Amierza/nawasena-backend/middleware"
+	"github.com/Amierza/nawasena-backend/repository"
+	"github.com/Amierza/nawasena-backend/routes"
+	"github.com/Amierza/nawasena-backend/service"
 	"github.com/gin-gonic/gin"
 )
 
