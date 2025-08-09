@@ -11,16 +11,13 @@ import (
 
 type (
 	IJWTService interface {
-		GenerateToken(userID string, role string, permissions []string) (string, string, error)
+		GenerateToken(adminID string) (string, string, error)
 		ValidateToken(token string) (*jwt.Token, error)
-		GetUserIDByToken(tokenString string) (string, error)
-		GetRoleIDByToken(tokenString string) (string, error)
+		GetAdminIDByToken(tokenString string) (string, error)
 	}
 
 	jwtCustomClaim struct {
-		UserID      string   `json:"user_id"`
-		RoleID      string   `json:"role_id"`
-		Permissions []string `json:"endpoints"`
+		AdminID string `json:"admin_id"`
 		jwt.RegisteredClaims
 	}
 
@@ -46,11 +43,9 @@ func getSecretKey() string {
 	return secretKey
 }
 
-func (j *JWTService) GenerateToken(userID string, roleID string, endpoints []string) (string, string, error) {
+func (j *JWTService) GenerateToken(adminID string) (string, string, error) {
 	accessClaims := jwtCustomClaim{
-		userID,
-		roleID,
-		endpoints,
+		adminID,
 		jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Second * 300)),
 			Issuer:    j.issuer,
@@ -65,9 +60,7 @@ func (j *JWTService) GenerateToken(userID string, roleID string, endpoints []str
 	}
 
 	refreshClaims := jwtCustomClaim{
-		userID,
-		roleID,
-		endpoints,
+		adminID,
 		jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Second * 3600 * 24 * 7)),
 			Issuer:    j.issuer,
@@ -101,7 +94,7 @@ func (j *JWTService) ValidateToken(tokenString string) (*jwt.Token, error) {
 	return token, err
 }
 
-func (j *JWTService) GetUserIDByToken(tokenString string) (string, error) {
+func (j *JWTService) GetAdminIDByToken(tokenString string) (string, error) {
 	token, err := j.ValidateToken(tokenString)
 	if err != nil {
 		return "", dto.ErrValidateToken
@@ -112,23 +105,7 @@ func (j *JWTService) GetUserIDByToken(tokenString string) (string, error) {
 		return "", dto.ErrTokenInvalid
 	}
 
-	userID := fmt.Sprintf("%v", claims["user_id"])
+	adminID := fmt.Sprintf("%v", claims["admin_id"])
 
-	return userID, nil
-}
-
-func (j *JWTService) GetRoleIDByToken(tokenString string) (string, error) {
-	token, err := j.ValidateToken(tokenString)
-	if err != nil {
-		return "", dto.ErrValidateToken
-	}
-
-	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok || !token.Valid {
-		return "", dto.ErrTokenInvalid
-	}
-
-	roleID := fmt.Sprintf("%v", claims["role_id"])
-
-	return roleID, nil
+	return adminID, nil
 }

@@ -6,6 +6,7 @@ import (
 
 	"github.com/Amierza/nawasena-backend/cmd"
 	"github.com/Amierza/nawasena-backend/config/database"
+	_ "github.com/Amierza/nawasena-backend/docs"
 	"github.com/Amierza/nawasena-backend/handler"
 	"github.com/Amierza/nawasena-backend/jwt"
 	"github.com/Amierza/nawasena-backend/middleware"
@@ -13,8 +14,31 @@ import (
 	"github.com/Amierza/nawasena-backend/routes"
 	"github.com/Amierza/nawasena-backend/service"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
+// @title           Nawasena API
+// @version         1.0
+// @description     API documentation for Nawasena project
+// @termsOfService  http://swagger.io/terms/
+
+// @contact.name   API Support
+// @contact.url    http://www.swagger.io/support
+// @contact.email  support@swagger.io
+
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host      localhost:8000
+// @BasePath  /api/v1
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+
+// @externalDocs.description  OpenAPI
+// @externalDocs.url          https://swagger.io/resources/open-api/
 func main() {
 	db := database.SetUpPostgreSQLConnection()
 	defer database.ClosePostgreSQLConnection(db)
@@ -27,15 +51,18 @@ func main() {
 	var (
 		jwtService = jwt.NewJWTService()
 
-		userRepo    = repository.NewUserRepository(db)
-		userService = service.NewUserService(userRepo, jwtService)
-		userHandler = handler.NewUserHandler(userService)
+		// Auth
+		authRepo    = repository.NewAuthRepository(db)
+		authService = service.NewAuthService(authRepo, jwtService)
+		authHandler = handler.NewAuthHandler(authService)
 	)
 
 	server := gin.Default()
 	server.Use(middleware.CORSMiddleware())
 
-	routes.User(server, userHandler, jwtService)
+	routes.Auth(server, authHandler, jwtService)
+	// swagger endpoint
+	server.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	server.Static("/assets", "./assets")
 
