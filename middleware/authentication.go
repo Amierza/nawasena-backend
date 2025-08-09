@@ -39,7 +39,7 @@ func Authentication(jwtService jwt.IJWTService) gin.HandlerFunc {
 			return
 		}
 
-		userID, err := jwtService.GetUserIDByToken(authHeader)
+		userID, err := jwtService.GetAdminIDByToken(authHeader)
 		if err != nil {
 			res := response.BuildResponseFailed(dto.MESSAGE_FAILED_PROSES_REQUEST, err.Error(), nil)
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, res)
