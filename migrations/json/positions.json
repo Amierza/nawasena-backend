@@ -1,0 +1,22 @@
+[
+  {
+    "id": "81f33bf0-d8ec-4025-9d23-f47ae9048049",
+    "name": "General Manager"
+  },
+  {
+    "id": "114c9681-d365-479d-b2ee-a4281f489f12",
+    "name": "Non Technical Lead"
+  },
+  {
+    "id": "4b538962-1318-4629-9e74-b3c617b70a9a",
+    "name": "Non Technical"
+  },
+  {
+    "id": "9cb0f91c-839a-434e-9748-bfa54d83fbce",
+    "name": "Technical Lead"
+  },
+  {
+    "id": "473df188-8599-4de8-beb3-c615387a7d47",
+    "name": "Technical"
+  }
+]

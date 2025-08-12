@@ -25,19 +25,6 @@ func NewFileHandler(fileService service.IFileService) *fileHandler {
 	}
 }
 
-// UploadFiles godoc
-//
-//	@Summary		Upload one or multiple files
-//	@Description	Upload single or multiple files
-//	@Tags			Upload
-//	@Security		BearerAuth
-//	@Accept			mpfd
-//	@Produce		json
-//	@Param			files	formData	[]file										true	"Files to upload"
-//	@Success		200		{object}	response.SwaggerResponseSuccess[[]string]	"List of uploaded file URLs"
-//	@Failure		400		{object}	response.SwaggerResponseError				"Invalid input"
-//	@Failure		401		{object}	response.SwaggerResponseError				"Unauthorized"
-//	@Router			/uploads [post]
 func (fh *fileHandler) UploadFiles(ctx *gin.Context) {
 	form, err := ctx.MultipartForm()
 	if err != nil {

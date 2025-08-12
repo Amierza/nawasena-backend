@@ -11,5 +11,10 @@ func Seed(db *gorm.DB) error {
 		return err
 	}
 
+	err = SeedFromJSON[entity.Position](db, "./migrations/json/positions.json", entity.Position{}, "Name")
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

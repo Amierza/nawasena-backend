@@ -29,19 +29,6 @@ func NewAdminHandler(adminService service.IAdminService) *adminHandler {
 	}
 }
 
-// CreateAdminForSuperAdmin godoc
-//
-//	@Summary		Create new admin (only for super admin)
-//	@Description	Create a new admin account only for super admin
-//	@Tags			Admin
-//	@Security		BearerAuth
-//	@Accept			json
-//	@Produce		json
-//	@Param			payload	body		dto.CreateAdminRequest								true	"Admin data"
-//	@Success		200		{object}	response.SwaggerResponseSuccess[dto.AdminResponse]	"Success create admin"
-//	@Failure		400		{object}	response.SwaggerResponseError						"Invalid input"
-//	@Failure		401		{object}	response.SwaggerResponseError						"Unauthorized"
-//	@Router			/admins [post]
 func (ah *adminHandler) Create(ctx *gin.Context) {
 	var payload dto.CreateAdminRequest
 	if err := ctx.ShouldBind(&payload); err != nil {
@@ -61,22 +48,6 @@ func (ah *adminHandler) Create(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
-// GetAllAdmin godoc
-//
-//	@Summary		Get all admins
-//	@Description	Get list of all admins (with or without pagination)
-//	@Tags			Admin
-//	@Security		BearerAuth
-//	@Accept			json
-//	@Produce		json
-//	@Param			search		query		string															false	"Search keyword if with pagination"
-//	@Param			page		query		int																false	"Page number if with pagination"
-//	@Param			limit		query		int																false	"Items per page if with pagination"
-//	@Param			pagination	query		bool															false	"With pagination or not (default true)"
-//	@Success		200			{object}	response.SwaggerResponseSuccess[[]dto.AdminResponse]			"Without pagination"
-//	@Success		200			{object}	response.SwaggerResponseSuccess[dto.AdminPaginationResponse]	"With pagination"
-//	@Failure		400			{object}	response.SwaggerResponseError									"Invalid input"
-//	@Router			/admins [get]
 func (ah *adminHandler) GetAll(ctx *gin.Context) {
 	paginationParam := ctx.DefaultQuery("pagination", "true")
 	usePagination := paginationParam != "false"
@@ -119,19 +90,6 @@ func (ah *adminHandler) GetAll(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
-// GetDetailAdmin godoc
-//
-//	@Summary		Get Admin Detail
-//	@Description	Retrieve admin details by ID
-//	@Tags			Admin
-//	@Security		BearerAuth
-//	@Accept			json
-//	@Produce		json
-//	@Param			id	path		string	true	"Admin ID"
-//	@Success		200	{object}	response.SwaggerResponseSuccess[dto.AdminResponse]
-//	@Failure		400	{object}	response.SwaggerResponseError	"Invalid input"
-//	@Failure		404	{object}	response.SwaggerResponseError	"Admin not found"
-//	@Router			/admins/{id} [get]
 func (ah *adminHandler) GetDetail(ctx *gin.Context) {
 	idStr := ctx.Param("id")
 	result, err := ah.adminService.GetDetail(ctx, idStr)
@@ -145,20 +103,6 @@ func (ah *adminHandler) GetDetail(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
-// UpdateAdmin godoc
-//
-//	@Summary		Update Admin
-//	@Description	Update admin information by ID
-//	@Tags			Admin
-//	@Security		BearerAuth
-//	@Accept			json
-//	@Produce		json
-//	@Param			id		path		string					true	"Admin ID"
-//	@Param			payload	body		dto.UpdateAdminRequest	true	"Update Admin Payload"
-//	@Success		200		{object}	response.SwaggerResponseSuccess[dto.AdminResponse]
-//	@Failure		400		{object}	response.SwaggerResponseError	"Invalid input"
-//	@Failure		404		{object}	response.SwaggerResponseError	"Admin not found"
-//	@Router			/admins/{id} [patch]
 func (ah *adminHandler) Update(ctx *gin.Context) {
 	idStr := ctx.Param("id")
 	var payload dto.UpdateAdminRequest
@@ -180,19 +124,6 @@ func (ah *adminHandler) Update(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, res)
 }
 
-// DeleteAdmin godoc
-//
-//	@Summary		Delete Admin
-//	@Description	Delete admin by ID
-//	@Tags			Admin
-//	@Security		BearerAuth
-//	@Accept			json
-//	@Produce		json
-//	@Param			id	path		string	true	"Admin ID"
-//	@Success		200	{object}	response.SwaggerResponseSuccess[dto.AdminResponse]
-//	@Failure		400	{object}	response.SwaggerResponseError	"Invalid request"
-//	@Failure		404	{object}	response.SwaggerResponseError	"Admin not found"
-//	@Router			/admins/{id} [delete]
 func (ah *adminHandler) Delete(ctx *gin.Context) {
 	idStr := ctx.Param("id")
 	result, err := ah.adminService.Delete(ctx, idStr)
