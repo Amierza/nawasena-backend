@@ -35,6 +35,13 @@ const (
 	MESSAGE_FAILED_UPDATE_ADMIN     = "failed update admin"
 	MESSAGE_FAILED_DELETE_ADMIN     = "failed delete admin"
 
+	// Position
+	MESSAGE_FAILED_CREATE_POSITION     = "failed create position"
+	MESSAGE_FAILED_GET_LIST_POSITION   = "failed get all position"
+	MESSAGE_FAILED_GET_DETAIL_POSITION = "failed get detail position"
+	MESSAGE_FAILED_UPDATE_POSITION     = "failed update position"
+	MESSAGE_FAILED_DELETE_POSITION     = "failed delete position"
+
 	// Authentication
 	MESSAGE_FAILED_LOGIN_USER    = "failed login user"
 	MESSAGE_FAILED_REFRESH_TOKEN = "failed refresh token"
@@ -53,6 +60,13 @@ const (
 	MESSAGE_SUCCESS_GET_DETAIL_ADMIN = "success get detail admin"
 	MESSAGE_SUCCESS_UPDATE_ADMIN     = "success update admin"
 	MESSAGE_SUCCESS_DELETE_ADMIN     = "success delete admin"
+
+	// Position
+	MESSAGE_SUCCESS_CREATE_POSITION     = "success create position"
+	MESSAGE_SUCCESS_GET_LIST_POSITION   = "success get all position"
+	MESSAGE_SUCCESS_GET_DETAIL_POSITION = "success get detail position"
+	MESSAGE_SUCCESS_UPDATE_POSITION     = "success update position"
+	MESSAGE_SUCCESS_DELETE_POSITION     = "success delete position"
 )
 
 var (
@@ -106,6 +120,17 @@ var (
 	ErrAdminAlreadyExists        = errors.New("failed admin already exists")
 	ErrUpdateAdmin               = errors.New("failed update admin")
 	ErrDeleteAdminByID           = errors.New("failed delete admin by id")
+
+	// Position
+	ErrGetPositionByName            = errors.New("failed get position by name")
+	ErrPositionNotFound             = errors.New("position not found")
+	ErrCreatePosition               = errors.New("failed create position")
+	ErrGetAllPosition               = errors.New("failed get all position")
+	ErrGetAllPositionNoPagination   = errors.New("failed get all position no pagination")
+	ErrGetAllPositionWithPagination = errors.New("failed get all position with pagination")
+	ErrPositionAlreadyExists        = errors.New("failed position already exists")
+	ErrUpdatePosition               = errors.New("failed update position")
+	ErrDeletePositionByID           = errors.New("failed delete position by id")
 )
 
 // Authentiation for Admin
@@ -129,25 +154,25 @@ type (
 // Admin
 type (
 	AdminResponse struct {
-		ID          string      `json:"id" example:"<uuid>"`
-		Name        string      `json:"name" example:"user"`
-		Email       string      `json:"email" example:"user@example.com"`
-		Password    string      `json:"password" example:"user1234"`
-		Role        entity.Role `json:"role" example:"user"`
-		PhoneNumber string      `json:"phone_number" example:"081234567891"`
+		ID          string      `json:"id"`
+		Name        string      `json:"name"`
+		Email       string      `json:"email"`
+		Password    string      `json:"password"`
+		Role        entity.Role `json:"role"`
+		PhoneNumber string      `json:"phone_number"`
 	}
 	CreateAdminRequest struct {
-		Name        string `json:"name" example:"user"`
-		Email       string `json:"email" example:"user@example.com"`
-		Password    string `json:"password" example:"user1234"`
-		PhoneNumber string `json:"phone_number" example:"081234567891"`
+		Name        string `json:"name"`
+		Email       string `json:"email"`
+		Password    string `json:"password"`
+		PhoneNumber string `json:"phone_number"`
 	}
 	UpdateAdminRequest struct {
-		ID          string `json:"-" example:"<uuid>"`
-		Name        string `json:"name,omitempty" example:"user"`
-		Email       string `json:"email,omitempty" example:"user@example.com"`
-		Password    string `json:"password,omitempty" example:"user1234"`
-		PhoneNumber string `json:"phone_number,omitempty" example:"081234567891"`
+		ID          string `json:"-"`
+		Name        string `json:"name,omitempty"`
+		Email       string `json:"email,omitempty"`
+		Password    string `json:"password,omitempty"`
+		PhoneNumber string `json:"phone_number,omitempty"`
 	}
 	AdminPaginationResponse struct {
 		response.PaginationResponse
@@ -156,5 +181,28 @@ type (
 	AdminPaginationRepositoryResponse struct {
 		response.PaginationResponse
 		Admins []entity.Admin
+	}
+)
+
+// Position
+type (
+	PositionResponse struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+	}
+	CreatePositionRequest struct {
+		Name string `json:"name"`
+	}
+	UpdatePositionRequest struct {
+		ID   string `json:"-"`
+		Name string `json:"name,omitempty"`
+	}
+	PositionPaginationResponse struct {
+		response.PaginationResponse
+		Data []PositionResponse `json:"data"`
+	}
+	PositionPaginationRepositoryResponse struct {
+		response.PaginationResponse
+		Positions []entity.Position
 	}
 )
