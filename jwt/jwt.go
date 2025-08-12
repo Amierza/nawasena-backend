@@ -10,25 +10,27 @@ import (
 )
 
 type (
-	IJWTService interface {
-		GenerateToken(adminID string) (string, string, error)
+	IJWT interface {
+		GenerateToken(adminID, roleName string) (string, string, error)
 		ValidateToken(token string) (*jwt.Token, error)
 		GetAdminIDByToken(tokenString string) (string, error)
+		GetAdminRoleNameByToken(tokenString string) (string, error)
 	}
 
 	jwtCustomClaim struct {
-		AdminID string `json:"admin_id"`
+		AdminID  string `json:"admin_id"`
+		RoleName string `json:"role_name"`
 		jwt.RegisteredClaims
 	}
 
-	JWTService struct {
+	JWT struct {
 		secretKey string
 		issuer    string
 	}
 )
 
-func NewJWTService() *JWTService {
-	return &JWTService{
+func NewJWT() *JWT {
+	return &JWT{
 		secretKey: getSecretKey(),
 		issuer:    "Template",
 	}
@@ -43,9 +45,10 @@ func getSecretKey() string {
 	return secretKey
 }
 
-func (j *JWTService) GenerateToken(adminID string) (string, string, error) {
+func (j *JWT) GenerateToken(userID, roleName string) (string, string, error) {
 	accessClaims := jwtCustomClaim{
-		adminID,
+		userID,
+		roleName,
 		jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Second * 300)),
 			Issuer:    j.issuer,
@@ -60,7 +63,8 @@ func (j *JWTService) GenerateToken(adminID string) (string, string, error) {
 	}
 
 	refreshClaims := jwtCustomClaim{
-		adminID,
+		userID,
+		roleName,
 		jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Second * 3600 * 24 * 7)),
 			Issuer:    j.issuer,
@@ -77,7 +81,7 @@ func (j *JWTService) GenerateToken(adminID string) (string, string, error) {
 	return accessTokenString, refreshTokenString, nil
 }
 
-func (j *JWTService) parseToken(t_ *jwt.Token) (any, error) {
+func (j *JWT) parseToken(t_ *jwt.Token) (any, error) {
 	if _, ok := t_.Method.(*jwt.SigningMethodHMAC); !ok {
 		return nil, dto.ErrUnexpectedSigningMethod
 	}
@@ -85,7 +89,7 @@ func (j *JWTService) parseToken(t_ *jwt.Token) (any, error) {
 	return []byte(j.secretKey), nil
 }
 
-func (j *JWTService) ValidateToken(tokenString string) (*jwt.Token, error) {
+func (j *JWT) ValidateToken(tokenString string) (*jwt.Token, error) {
 	token, err := jwt.Parse(tokenString, j.parseToken)
 	if err != nil {
 		return nil, err
@@ -94,7 +98,7 @@ func (j *JWTService) ValidateToken(tokenString string) (*jwt.Token, error) {
 	return token, err
 }
 
-func (j *JWTService) GetAdminIDByToken(tokenString string) (string, error) {
+func (j *JWT) GetAdminIDByToken(tokenString string) (string, error) {
 	token, err := j.ValidateToken(tokenString)
 	if err != nil {
 		return "", dto.ErrValidateToken
@@ -105,7 +109,23 @@ func (j *JWTService) GetAdminIDByToken(tokenString string) (string, error) {
 		return "", dto.ErrTokenInvalid
 	}
 
-	adminID := fmt.Sprintf("%v", claims["admin_id"])
+	userID := fmt.Sprintf("%v", claims["user_id"])
 
-	return adminID, nil
+	return userID, nil
+}
+
+func (j *JWT) GetAdminRoleNameByToken(tokenString string) (string, error) {
+	token, err := j.ValidateToken(tokenString)
+	if err != nil {
+		return "", dto.ErrValidateToken
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || !token.Valid {
+		return "", dto.ErrTokenInvalid
+	}
+
+	roleName := fmt.Sprintf("%v", claims["role_name"])
+
+	return roleName, nil
 }

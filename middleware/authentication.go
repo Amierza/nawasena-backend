@@ -10,7 +10,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Authentication(jwtService jwt.IJWTService) gin.HandlerFunc {
+func Authentication(jwt jwt.IJWT) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		authHeader := ctx.GetHeader("Authorization")
 		if authHeader == "" {
@@ -26,7 +26,7 @@ func Authentication(jwtService jwt.IJWTService) gin.HandlerFunc {
 		}
 
 		authHeader = strings.Replace(authHeader, "Bearer ", "", -1)
-		token, err := jwtService.ValidateToken(authHeader)
+		token, err := jwt.ValidateToken(authHeader)
 		if err != nil {
 			res := response.BuildResponseFailed(dto.MESSAGE_FAILED_PROSES_REQUEST, dto.MESSAGE_FAILED_TOKEN_NOT_VALID, nil)
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, res)
@@ -39,7 +39,7 @@ func Authentication(jwtService jwt.IJWTService) gin.HandlerFunc {
 			return
 		}
 
-		userID, err := jwtService.GetAdminIDByToken(authHeader)
+		adminID, err := jwt.GetAdminIDByToken(authHeader)
 		if err != nil {
 			res := response.BuildResponseFailed(dto.MESSAGE_FAILED_PROSES_REQUEST, err.Error(), nil)
 			ctx.AbortWithStatusJSON(http.StatusUnauthorized, res)
@@ -47,7 +47,7 @@ func Authentication(jwtService jwt.IJWTService) gin.HandlerFunc {
 		}
 
 		ctx.Set("Authorization", authHeader)
-		ctx.Set("user_id", userID)
+		ctx.Set("admin_id", adminID)
 		ctx.Next()
 	}
 }

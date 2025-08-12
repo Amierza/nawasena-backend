@@ -16,15 +16,15 @@ type (
 	}
 
 	authService struct {
-		authRepo   repository.IAuthRepository
-		jwtService jwt.IJWTService
+		authRepo repository.IAuthRepository
+		jwt      jwt.IJWT
 	}
 )
 
-func NewAuthService(authRepo repository.IAuthRepository, jwtService jwt.IJWTService) *authService {
+func NewAuthService(authRepo repository.IAuthRepository, jwt jwt.IJWT) *authService {
 	return &authService{
-		authRepo:   authRepo,
-		jwtService: jwtService,
+		authRepo: authRepo,
+		jwt:      jwt,
 	}
 }
 
@@ -50,7 +50,7 @@ func (as *authService) Login(ctx context.Context, req dto.LoginRequest) (dto.Log
 		return dto.LoginResponse{}, dto.ErrIncorrectPassword
 	}
 
-	accessToken, refreshToken, err := as.jwtService.GenerateToken(admin.ID.String())
+	accessToken, refreshToken, err := as.jwt.GenerateToken(admin.ID.String(), string(admin.Role))
 	if err != nil {
 		return dto.LoginResponse{}, err
 	}
@@ -62,17 +62,22 @@ func (as *authService) Login(ctx context.Context, req dto.LoginRequest) (dto.Log
 }
 
 func (as *authService) RefreshToken(ctx context.Context, req dto.RefreshTokenRequest) (dto.RefreshTokenResponse, error) {
-	_, err := as.jwtService.ValidateToken(req.RefreshToken)
+	_, err := as.jwt.ValidateToken(req.RefreshToken)
 	if err != nil {
 		return dto.RefreshTokenResponse{}, dto.ErrValidateToken
 	}
 
-	adminID, err := as.jwtService.GetAdminIDByToken(req.RefreshToken)
+	adminID, err := as.jwt.GetAdminIDByToken(req.RefreshToken)
 	if err != nil {
 		return dto.RefreshTokenResponse{}, dto.ErrGetAdminIDFromToken
 	}
 
-	accessToken, _, err := as.jwtService.GenerateToken(adminID)
+	adminRole, err := as.jwt.GetAdminRoleNameByToken(req.RefreshToken)
+	if err != nil {
+		return dto.RefreshTokenResponse{}, dto.ErrGetAdminRoleNameFromToken
+	}
+
+	accessToken, _, err := as.jwt.GenerateToken(adminID, adminRole)
 	if err != nil {
 		return dto.RefreshTokenResponse{}, dto.ErrGenerateAccessToken
 	}

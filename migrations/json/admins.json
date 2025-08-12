@@ -4,6 +4,7 @@
     "name": "admin1",
     "email": "admin1@gmail.com",
     "password": "adminnn1",
+    "role": "admin",
     "phone_number": "081234567891"
   },
   {
@@ -11,6 +12,7 @@
     "name": "admin2",
     "email": "admin2@gmail.com",
     "password": "adminnn2",
+    "role": "admin",
     "phone_number": "081234567892"
   }
 ]

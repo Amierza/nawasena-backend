@@ -6,8 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Auth(route *gin.Engine, authHandler handler.IAuthHandler, jwtService jwt.IJWTService) {
-	routes := route.Group("/api/v1/auth")
+func Auth(route *gin.Engine, authHandler handler.IAuthHandler, jwtService jwt.IJWT) {
+	routes := route.Group("/api/v1")
 	{
 		routes.POST("/login", authHandler.Login)
 		routes.POST("/refresh-token", authHandler.RefreshToken)
