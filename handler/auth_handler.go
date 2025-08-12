@@ -27,16 +27,17 @@ func NewAuthHandler(authService service.IAuthService) *authHandler {
 }
 
 // Login godoc
-// @Summary Login admin
-// @Description Authenticate admin and return access & refresh tokens
-// @Tags Auth
-// @Accept json
-// @Produce json
-// @Param request body dto.LoginRequest true "Login credentials"
-// @Success 200 {object} response.Response{data=dto.LoginResponse}
-// @Failure 400 {object} response.Response
-// @Failure 401 {object} response.Response
-// @Router /api/v1/auth/login [post]
+//
+//	@Summary		Login admin
+//	@Description	Authenticate admin and return access & refresh tokens
+//	@Tags			Auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			payload	body		dto.LoginRequest									true	"Login credentials"
+//	@Success		200		{object}	response.SwaggerResponseSuccess[dto.LoginResponse]	"Success login"
+//	@Failure		400		{object}	response.SwaggerResponseError						"Invalid input"
+//	@Failure		404		{object}	response.SwaggerResponseError						"Admin account not found"
+//	@Router			/login [post]
 func (ah *authHandler) Login(ctx *gin.Context) {
 	var payload dto.LoginRequest
 	if err := ctx.ShouldBind(&payload); err != nil {
@@ -57,16 +58,16 @@ func (ah *authHandler) Login(ctx *gin.Context) {
 }
 
 // RefreshToken godoc
-// @Summary Refresh access token
-// @Description Get a new access token using refresh token
-// @Tags Auth
-// @Accept json
-// @Produce json
-// @Param request body dto.RefreshTokenRequest true "Refresh token payload"
-// @Success 200 {object} response.Response{data=dto.RefreshTokenResponse}
-// @Failure 400 {object} response.Response
-// @Failure 401 {object} response.Response
-// @Router /api/v1/auth/refresh-token [post]
+//
+//	@Summary		Refresh access token
+//	@Description	Get a new access token using refresh token
+//	@Tags			Auth
+//	@Accept			json
+//	@Produce		json
+//	@Param			payload	body		dto.RefreshTokenRequest										true	"Refresh token payload"
+//	@Success		200		{object}	response.SwaggerResponseSuccess[dto.RefreshTokenResponse]	"Success refresh access token"
+//	@Failure		400		{object}	response.SwaggerResponseError								"Invalid <access_token>"
+//	@Router			/refresh-token [post]
 func (ah *authHandler) RefreshToken(ctx *gin.Context) {
 	var payload dto.RefreshTokenRequest
 	if err := ctx.ShouldBind(&payload); err != nil {

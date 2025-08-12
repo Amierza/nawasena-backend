@@ -18,7 +18,7 @@
     "host": "nawasena-backend-production.up.railway.app",
     "basePath": "/api/v1",
     "paths": {
-        "/api/v1/auth/login": {
+        "/login": {
             "post": {
                 "description": "Authenticate admin and return access \u0026 refresh tokens",
                 "consumes": [
@@ -34,7 +34,7 @@
                 "parameters": [
                     {
                         "description": "Login credentials",
-                        "name": "request",
+                        "name": "payload",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -44,39 +44,27 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Success login",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/dto.LoginResponse"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/response.SwaggerResponseSuccess-dto_LoginResponse"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Invalid input",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/response.SwaggerResponseError"
                         }
                     },
-                    "401": {
-                        "description": "Unauthorized",
+                    "404": {
+                        "description": "Admin account not found",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/response.SwaggerResponseError"
                         }
                     }
                 }
             }
         },
-        "/api/v1/auth/refresh-token": {
+        "/refresh-token": {
             "post": {
                 "description": "Get a new access token using refresh token",
                 "consumes": [
@@ -92,7 +80,7 @@
                 "parameters": [
                     {
                         "description": "Refresh token payload",
-                        "name": "request",
+                        "name": "payload",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -102,33 +90,64 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "OK",
+                        "description": "Success refresh access token",
                         "schema": {
-                            "allOf": [
-                                {
-                                    "$ref": "#/definitions/response.Response"
-                                },
-                                {
-                                    "type": "object",
-                                    "properties": {
-                                        "data": {
-                                            "$ref": "#/definitions/dto.RefreshTokenResponse"
-                                        }
-                                    }
-                                }
-                            ]
+                            "$ref": "#/definitions/response.SwaggerResponseSuccess-dto_RefreshTokenResponse"
                         }
                     },
                     "400": {
-                        "description": "Bad Request",
+                        "description": "Invalid \u003caccess_token\u003e",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/response.SwaggerResponseError"
+                        }
+                    }
+                }
+            }
+        },
+        "/uploads": {
+            "post": {
+                "security": [
+                    {
+                        "BearerAuth": []
+                    }
+                ],
+                "description": "Upload single or multiple files",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Upload"
+                ],
+                "summary": "Upload one or multiple files",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "Files to upload",
+                        "name": "files",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of uploaded file URLs",
+                        "schema": {
+                            "$ref": "#/definitions/response.SwaggerResponseSuccess-array_string"
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid input",
+                        "schema": {
+                            "$ref": "#/definitions/response.SwaggerResponseError"
                         }
                     },
                     "401": {
                         "description": "Unauthorized",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/response.SwaggerResponseError"
                         }
                     }
                 }
@@ -180,17 +199,80 @@
                 }
             }
         },
-        "response.Response": {
+        "response.SwaggerResponseError": {
             "type": "object",
             "properties": {
-                "data": {},
                 "error": {},
                 "message": {
+                    "type": "string",
+                    "example": "Invalid input"
+                },
+                "status": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "timestamp": {
                     "type": "string"
+                }
+            }
+        },
+        "response.SwaggerResponseSuccess-array_string": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Success create user"
                 },
                 "meta": {},
                 "status": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": true
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.SwaggerResponseSuccess-dto_LoginResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dto.LoginResponse"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Success create user"
+                },
+                "meta": {},
+                "status": {
+                    "type": "boolean",
+                    "example": true
+                },
+                "timestamp": {
+                    "type": "string"
+                }
+            }
+        },
+        "response.SwaggerResponseSuccess-dto_RefreshTokenResponse": {
+            "type": "object",
+            "properties": {
+                "data": {
+                    "$ref": "#/definitions/dto.RefreshTokenResponse"
+                },
+                "message": {
+                    "type": "string",
+                    "example": "Success create user"
+                },
+                "meta": {},
+                "status": {
+                    "type": "boolean",
+                    "example": true
                 },
                 "timestamp": {
                     "type": "string"

@@ -1,5 +1,6 @@
 *.env
 storage/
-!assets/
 volumes/
 .vscode/
+assets/**
+!assets/

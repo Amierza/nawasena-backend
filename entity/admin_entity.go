@@ -11,6 +11,7 @@ type Admin struct {
 	Name        string    `gorm:"type:varchar(150);not null" json:"name"`
 	Email       string    `gorm:"unique;not null" json:"email"`
 	Password    string    `gorm:"not null" json:"password"`
+	Role        Role      `gorm:"type:varchar(20);not null" json:"role"`
 	PhoneNumber string    `gorm:"type:varchar(20)" json:"phone_number"`
 
 	TimeStamp

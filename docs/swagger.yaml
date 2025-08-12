@@ -30,14 +30,58 @@ definitions:
         example: <new_access_token_here>
         type: string
     type: object
-  response.Response:
+  response.SwaggerResponseError:
     properties:
-      data: {}
       error: {}
       message:
+        example: Invalid input
+        type: string
+      status:
+        example: false
+        type: boolean
+      timestamp:
+        type: string
+    type: object
+  response.SwaggerResponseSuccess-array_string:
+    properties:
+      data:
+        items:
+          type: string
+        type: array
+      message:
+        example: Success create user
         type: string
       meta: {}
       status:
+        example: true
+        type: boolean
+      timestamp:
+        type: string
+    type: object
+  response.SwaggerResponseSuccess-dto_LoginResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dto.LoginResponse'
+      message:
+        example: Success create user
+        type: string
+      meta: {}
+      status:
+        example: true
+        type: boolean
+      timestamp:
+        type: string
+    type: object
+  response.SwaggerResponseSuccess-dto_RefreshTokenResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dto.RefreshTokenResponse'
+      message:
+        example: Success create user
+        type: string
+      meta: {}
+      status:
+        example: true
         type: boolean
       timestamp:
         type: string
@@ -59,7 +103,7 @@ info:
   title: Nawasena API
   version: "1.0"
 paths:
-  /api/v1/auth/login:
+  /login:
     post:
       consumes:
       - application/json
@@ -67,7 +111,7 @@ paths:
       parameters:
       - description: Login credentials
         in: body
-        name: request
+        name: payload
         required: true
         schema:
           $ref: '#/definitions/dto.LoginRequest'
@@ -75,26 +119,21 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Success login
           schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/dto.LoginResponse'
-              type: object
+            $ref: '#/definitions/response.SwaggerResponseSuccess-dto_LoginResponse'
         "400":
-          description: Bad Request
+          description: Invalid input
           schema:
-            $ref: '#/definitions/response.Response'
-        "401":
-          description: Unauthorized
+            $ref: '#/definitions/response.SwaggerResponseError'
+        "404":
+          description: Admin account not found
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/response.SwaggerResponseError'
       summary: Login admin
       tags:
       - Auth
-  /api/v1/auth/refresh-token:
+  /refresh-token:
     post:
       consumes:
       - application/json
@@ -102,7 +141,7 @@ paths:
       parameters:
       - description: Refresh token payload
         in: body
-        name: request
+        name: payload
         required: true
         schema:
           $ref: '#/definitions/dto.RefreshTokenRequest'
@@ -110,25 +149,47 @@ paths:
       - application/json
       responses:
         "200":
-          description: OK
+          description: Success refresh access token
           schema:
-            allOf:
-            - $ref: '#/definitions/response.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/dto.RefreshTokenResponse'
-              type: object
+            $ref: '#/definitions/response.SwaggerResponseSuccess-dto_RefreshTokenResponse'
         "400":
-          description: Bad Request
+          description: Invalid <access_token>
           schema:
-            $ref: '#/definitions/response.Response'
-        "401":
-          description: Unauthorized
-          schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/response.SwaggerResponseError'
       summary: Refresh access token
       tags:
       - Auth
+  /uploads:
+    post:
+      consumes:
+      - application/json
+      description: Upload single or multiple files
+      parameters:
+      - description: Files to upload
+        in: formData
+        name: files
+        required: true
+        type: file
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: List of uploaded file URLs
+          schema:
+            $ref: '#/definitions/response.SwaggerResponseSuccess-array_string'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/response.SwaggerResponseError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.SwaggerResponseError'
+      security:
+      - BearerAuth: []
+      summary: Upload one or multiple files
+      tags:
+      - Upload
 securityDefinitions:
   BearerAuth:
     in: header
