@@ -119,7 +119,7 @@ const docTemplate = `{
                 ],
                 "description": "Upload single or multiple files",
                 "consumes": [
-                    "application/json"
+                    "multipart/form-data"
                 ],
                 "produces": [
                     "application/json"
@@ -130,7 +130,11 @@ const docTemplate = `{
                 "summary": "Upload one or multiple files",
                 "parameters": [
                     {
-                        "type": "file",
+                        "type": "array",
+                        "items": {
+                            "type": "file"
+                        },
+                        "collectionFormat": "csv",
                         "description": "Files to upload",
                         "name": "files",
                         "in": "formData",
@@ -232,8 +236,7 @@ const docTemplate = `{
                     }
                 },
                 "message": {
-                    "type": "string",
-                    "example": "Success create user"
+                    "type": "string"
                 },
                 "meta": {},
                 "status": {
@@ -252,8 +255,7 @@ const docTemplate = `{
                     "$ref": "#/definitions/dto.LoginResponse"
                 },
                 "message": {
-                    "type": "string",
-                    "example": "Success create user"
+                    "type": "string"
                 },
                 "meta": {},
                 "status": {
@@ -272,8 +274,7 @@ const docTemplate = `{
                     "$ref": "#/definitions/dto.RefreshTokenResponse"
                 },
                 "message": {
-                    "type": "string",
-                    "example": "Success create user"
+                    "type": "string"
                 },
                 "meta": {},
                 "status": {

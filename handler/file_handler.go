@@ -31,9 +31,9 @@ func NewFileHandler(fileService service.IFileService) *fileHandler {
 //	@Description	Upload single or multiple files
 //	@Tags			Upload
 //	@Security		BearerAuth
-//	@Accept			json
+//	@Accept			mpfd
 //	@Produce		json
-//	@Param			files	formData	file										true	"Files to upload"
+//	@Param			files	formData	[]file										true	"Files to upload"
 //	@Success		200		{object}	response.SwaggerResponseSuccess[[]string]	"List of uploaded file URLs"
 //	@Failure		400		{object}	response.SwaggerResponseError				"Invalid input"
 //	@Failure		401		{object}	response.SwaggerResponseError				"Unauthorized"
