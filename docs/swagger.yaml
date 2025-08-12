@@ -1,5 +1,57 @@
 basePath: /api/v1
 definitions:
+  dto.AdminPaginationResponse:
+    properties:
+      count:
+        type: integer
+      data:
+        items:
+          $ref: '#/definitions/dto.AdminResponse'
+        type: array
+      max_page:
+        type: integer
+      page:
+        type: integer
+      per_page:
+        type: integer
+    type: object
+  dto.AdminResponse:
+    properties:
+      email:
+        example: user@example.com
+        type: string
+      id:
+        example: <uuid>
+        type: string
+      name:
+        example: user
+        type: string
+      password:
+        example: user1234
+        type: string
+      phone_number:
+        example: "081234567891"
+        type: string
+      role:
+        allOf:
+        - $ref: '#/definitions/entity.Role'
+        example: user
+    type: object
+  dto.CreateAdminRequest:
+    properties:
+      email:
+        example: user@example.com
+        type: string
+      name:
+        example: user
+        type: string
+      password:
+        example: user1234
+        type: string
+      phone_number:
+        example: "081234567891"
+        type: string
+    type: object
   dto.LoginRequest:
     properties:
       email:
@@ -30,6 +82,29 @@ definitions:
         example: <new_access_token_here>
         type: string
     type: object
+  dto.UpdateAdminRequest:
+    properties:
+      email:
+        example: user@example.com
+        type: string
+      name:
+        example: user
+        type: string
+      password:
+        example: user1234
+        type: string
+      phone_number:
+        example: "081234567891"
+        type: string
+    type: object
+  entity.Role:
+    enum:
+    - super admin
+    - admin
+    type: string
+    x-enum-varnames:
+    - SuperAdminRole
+    - AdminRole
   response.SwaggerResponseError:
     properties:
       error: {}
@@ -42,12 +117,53 @@ definitions:
       timestamp:
         type: string
     type: object
+  response.SwaggerResponseSuccess-array_dto_AdminResponse:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/dto.AdminResponse'
+        type: array
+      message:
+        type: string
+      meta: {}
+      status:
+        example: true
+        type: boolean
+      timestamp:
+        type: string
+    type: object
   response.SwaggerResponseSuccess-array_string:
     properties:
       data:
         items:
           type: string
         type: array
+      message:
+        type: string
+      meta: {}
+      status:
+        example: true
+        type: boolean
+      timestamp:
+        type: string
+    type: object
+  response.SwaggerResponseSuccess-dto_AdminPaginationResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dto.AdminPaginationResponse'
+      message:
+        type: string
+      meta: {}
+      status:
+        example: true
+        type: boolean
+      timestamp:
+        type: string
+    type: object
+  response.SwaggerResponseSuccess-dto_AdminResponse:
+    properties:
+      data:
+        $ref: '#/definitions/dto.AdminResponse'
       message:
         type: string
       meta: {}
@@ -100,6 +216,172 @@ info:
   title: Nawasena API
   version: "1.0"
 paths:
+  /admins:
+    get:
+      consumes:
+      - application/json
+      description: Get list of all admins (with or without pagination)
+      parameters:
+      - description: Search keyword if with pagination
+        in: query
+        name: search
+        type: string
+      - description: Page number if with pagination
+        in: query
+        name: page
+        type: integer
+      - description: Items per page if with pagination
+        in: query
+        name: limit
+        type: integer
+      - description: With pagination or not (default true)
+        in: query
+        name: pagination
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: With pagination
+          schema:
+            $ref: '#/definitions/response.SwaggerResponseSuccess-dto_AdminPaginationResponse'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/response.SwaggerResponseError'
+      security:
+      - BearerAuth: []
+      summary: Get all admins
+      tags:
+      - Admin
+    post:
+      consumes:
+      - application/json
+      description: Create a new admin account only for super admin
+      parameters:
+      - description: Admin data
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.CreateAdminRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Success create admin
+          schema:
+            $ref: '#/definitions/response.SwaggerResponseSuccess-dto_AdminResponse'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/response.SwaggerResponseError'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/response.SwaggerResponseError'
+      security:
+      - BearerAuth: []
+      summary: Create new admin (only for super admin)
+      tags:
+      - Admin
+  /admins/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete admin by ID
+      parameters:
+      - description: Admin ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.SwaggerResponseSuccess-dto_AdminResponse'
+        "400":
+          description: Invalid request
+          schema:
+            $ref: '#/definitions/response.SwaggerResponseError'
+        "404":
+          description: Admin not found
+          schema:
+            $ref: '#/definitions/response.SwaggerResponseError'
+      security:
+      - BearerAuth: []
+      summary: Delete Admin
+      tags:
+      - Admin
+    get:
+      consumes:
+      - application/json
+      description: Retrieve admin details by ID
+      parameters:
+      - description: Admin ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.SwaggerResponseSuccess-dto_AdminResponse'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/response.SwaggerResponseError'
+        "404":
+          description: Admin not found
+          schema:
+            $ref: '#/definitions/response.SwaggerResponseError'
+      security:
+      - BearerAuth: []
+      summary: Get Admin Detail
+      tags:
+      - Admin
+    patch:
+      consumes:
+      - application/json
+      description: Update admin information by ID
+      parameters:
+      - description: Admin ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Update Admin Payload
+        in: body
+        name: payload
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateAdminRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.SwaggerResponseSuccess-dto_AdminResponse'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/response.SwaggerResponseError'
+        "404":
+          description: Admin not found
+          schema:
+            $ref: '#/definitions/response.SwaggerResponseError'
+      security:
+      - BearerAuth: []
+      summary: Update Admin
+      tags:
+      - Admin
   /login:
     post:
       consumes:

@@ -59,6 +59,11 @@ func main() {
 		// Files
 		fileService = service.NewFileService()
 		fileHandler = handler.NewFileHandler(fileService)
+
+		// Admin
+		adminRepo    = repository.NewAdminRepository(db)
+		adminService = service.NewAdminService(adminRepo, jwt)
+		adminHandler = handler.NewAdminHandler(adminService)
 	)
 
 	server := gin.Default()
@@ -66,6 +71,7 @@ func main() {
 
 	routes.Auth(server, authHandler, jwt)
 	routes.File(server, fileHandler, jwt)
+	routes.Admin(server, adminHandler, jwt)
 	// swagger endpoint
 	server.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 

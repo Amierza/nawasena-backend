@@ -2,6 +2,9 @@ package dto
 
 import (
 	"errors"
+
+	"github.com/Amierza/nawasena-backend/entity"
+	"github.com/Amierza/nawasena-backend/response"
 )
 
 const (
@@ -25,6 +28,13 @@ const (
 	MESSAGE_FAILED_FILES_IS_EMPTY       = "failed files is empty"
 	MESSAGE_FAILED_UPLOAD_FILES         = "failed upload files"
 
+	// Admin
+	MESSAGE_FAILED_CREATE_ADMIN     = "failed create admin"
+	MESSAGE_FAILED_GET_LIST_ADMIN   = "failed get all admin"
+	MESSAGE_FAILED_GET_DETAIL_ADMIN = "failed get detail admin"
+	MESSAGE_FAILED_UPDATE_ADMIN     = "failed update admin"
+	MESSAGE_FAILED_DELETE_ADMIN     = "failed delete admin"
+
 	// Authentication
 	MESSAGE_FAILED_LOGIN_USER    = "failed login user"
 	MESSAGE_FAILED_REFRESH_TOKEN = "failed refresh token"
@@ -36,6 +46,13 @@ const (
 	// Authentication
 	MESSAGE_SUCCESS_LOGIN_USER    = "success login user"
 	MESSAGE_SUCCESS_REFRESH_TOKEN = "success refresh token"
+
+	// Admin
+	MESSAGE_SUCCESS_CREATE_ADMIN     = "success create admin"
+	MESSAGE_SUCCESS_GET_LIST_ADMIN   = "success get all admin"
+	MESSAGE_SUCCESS_GET_DETAIL_ADMIN = "success get detail admin"
+	MESSAGE_SUCCESS_UPDATE_ADMIN     = "success update admin"
+	MESSAGE_SUCCESS_DELETE_ADMIN     = "success delete admin"
 )
 
 var (
@@ -52,6 +69,19 @@ var (
 	// Middleware
 	ErrDeniedAccess = errors.New("denied access")
 
+	// Input Validation
+	ErrEmptyEmail       = errors.New("email is required")
+	ErrEmptyPassword    = errors.New("password is required")
+	ErrEmptyName        = errors.New("name is required")
+	ErrNameTooShort     = errors.New("name must be at least 3 characters")
+	ErrEmptyDesc        = errors.New("description is required")
+	ErrDescTooShort     = errors.New("description must be at least 5 characters")
+	ErrEmptyImages      = errors.New("failed image is required")
+	ErrEmptyPhoneNumber = errors.New("failed phone number is required")
+
+	// Phone Number
+	ErrFormatPhoneNumber = errors.New("failed format phone number")
+
 	// File
 	ErrNoFilesUploaded    = errors.New("failed no files uploaded")
 	ErrInvalidFileType    = errors.New("only jpg/jpeg/png allowed")
@@ -63,8 +93,19 @@ var (
 	ErrInvalidEmail      = errors.New("email is required and must be in a valid format (ex: admin@example.com)")
 	ErrInvalidPassword   = errors.New("password is required and must be at least 8 characters long")
 	ErrIncorrectPassword = errors.New("incorrect password")
-	ErrGetAdminByEmail   = errors.New("failed get admin by email")
-	ErrAdminNotFound     = errors.New("admin not found")
+
+	// Admin
+	ErrGetAdminByEmail           = errors.New("failed get admin by email")
+	ErrAdminNotFound             = errors.New("admin not found")
+	ErrEmailAlreadyExists        = errors.New("failed email already exists")
+	ErrHashPassword              = errors.New("failed hash password")
+	ErrCreateAdmin               = errors.New("failed create admin")
+	ErrGetAllAdmin               = errors.New("failed get all admin")
+	ErrGetAllAdminNoPagination   = errors.New("failed get all admin no pagination")
+	ErrGetAllAdminWithPagination = errors.New("failed get all admin with pagination")
+	ErrAdminAlreadyExists        = errors.New("failed admin already exists")
+	ErrUpdateAdmin               = errors.New("failed update admin")
+	ErrDeleteAdminByID           = errors.New("failed delete admin by id")
 )
 
 // Authentiation for Admin
@@ -82,5 +123,38 @@ type (
 	}
 	RefreshTokenResponse struct {
 		AccessToken string `json:"access_token" example:"<new_access_token_here>"`
+	}
+)
+
+// Admin
+type (
+	AdminResponse struct {
+		ID          string      `json:"id" example:"<uuid>"`
+		Name        string      `json:"name" example:"user"`
+		Email       string      `json:"email" example:"user@example.com"`
+		Password    string      `json:"password" example:"user1234"`
+		Role        entity.Role `json:"role" example:"user"`
+		PhoneNumber string      `json:"phone_number" example:"081234567891"`
+	}
+	CreateAdminRequest struct {
+		Name        string `json:"name" example:"user"`
+		Email       string `json:"email" example:"user@example.com"`
+		Password    string `json:"password" example:"user1234"`
+		PhoneNumber string `json:"phone_number" example:"081234567891"`
+	}
+	UpdateAdminRequest struct {
+		ID          string `json:"-" example:"<uuid>"`
+		Name        string `json:"name,omitempty" example:"user"`
+		Email       string `json:"email,omitempty" example:"user@example.com"`
+		Password    string `json:"password,omitempty" example:"user1234"`
+		PhoneNumber string `json:"phone_number,omitempty" example:"081234567891"`
+	}
+	AdminPaginationResponse struct {
+		response.PaginationResponse
+		Data []AdminResponse `json:"data"`
+	}
+	AdminPaginationRepositoryResponse struct {
+		response.PaginationResponse
+		Admins []entity.Admin
 	}
 )
