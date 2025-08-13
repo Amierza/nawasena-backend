@@ -65,6 +65,11 @@ func main() {
 		competitionRepo    = repository.NewCompetitionRepository(db)
 		competitionService = service.NewCompetitionService(competitionRepo, jwt)
 		competitionHandler = handler.NewCompetitionHandler(competitionService)
+
+		// Partner
+		partnerRepo    = repository.NewPartnerRepository(db)
+		partnerService = service.NewPartnerService(partnerRepo, jwt)
+		partnerHandler = handler.NewPartnerHandler(partnerService)
 	)
 
 	server := gin.Default()
@@ -78,6 +83,7 @@ func main() {
 	routes.Achievement(server, achievementHandler, jwt)
 	routes.Ship(server, shipHandler, jwt)
 	routes.Competition(server, competitionHandler, jwt)
+	routes.Partner(server, partnerHandler, jwt)
 
 	server.Static("/assets", "./assets")
 

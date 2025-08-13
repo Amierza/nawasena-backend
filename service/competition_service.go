@@ -304,7 +304,9 @@ func (as *competitionService) Update(ctx context.Context, req dto.UpdateCompetit
 			// Delete Existing Competition Image
 			// in assets
 			for _, img := range oldImages {
-				if err := os.Remove(img.Name); err != nil && !os.IsNotExist(err) {
+				name := strings.TrimPrefix(img.Name, "assets/")
+				path := filepath.Join("assets", name)
+				if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
 					return dto.ErrDeleteOldImage
 				}
 			}

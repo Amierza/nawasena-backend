@@ -74,6 +74,13 @@ const (
 	MESSAGE_FAILED_UPDATE_COMPETITION     = "failed update competition"
 	MESSAGE_FAILED_DELETE_COMPETITION     = "failed delete competition"
 
+	// Partner
+	MESSAGE_FAILED_CREATE_PARTNER     = "failed create partner"
+	MESSAGE_FAILED_GET_LIST_PARTNER   = "failed get all partner"
+	MESSAGE_FAILED_GET_DETAIL_PARTNER = "failed get detail partner"
+	MESSAGE_FAILED_UPDATE_PARTNER     = "failed update partner"
+	MESSAGE_FAILED_DELETE_PARTNER     = "failed delete partner"
+
 	// ====================================== Success ======================================
 	// File
 	MESSAGE_SUCCESS_UPLOAD_FILES = "success upload files"
@@ -123,6 +130,13 @@ const (
 	MESSAGE_SUCCESS_GET_DETAIL_COMPETITION = "success get detail competition"
 	MESSAGE_SUCCESS_UPDATE_COMPETITION     = "success update competition"
 	MESSAGE_SUCCESS_DELETE_COMPETITION     = "success delete competition"
+
+	// Partner
+	MESSAGE_SUCCESS_CREATE_PARTNER     = "success create partner"
+	MESSAGE_SUCCESS_GET_LIST_PARTNER   = "success get all partner"
+	MESSAGE_SUCCESS_GET_DETAIL_PARTNER = "success get detail partner"
+	MESSAGE_SUCCESS_UPDATE_PARTNER     = "success update partner"
+	MESSAGE_SUCCESS_DELETE_PARTNER     = "success delete partner"
 )
 
 var (
@@ -256,6 +270,18 @@ var (
 	ErrUpdateCompetition                     = errors.New("failed update competition")
 	ErrDeleteCompetitionByID                 = errors.New("failed delete competition by id")
 	ErrDeleteCompetitionImageByCompetitionID = errors.New("failed delete competition image by ship id")
+
+	// Partner
+	ErrGetPartnerByID              = errors.New("failed get partner by id")
+	ErrGetPartnerImage             = errors.New("failed get partner image")
+	ErrPartnerNotFound             = errors.New("partner not found")
+	ErrCreatePartner               = errors.New("failed create partner")
+	ErrGetAllPartner               = errors.New("failed get all partner")
+	ErrGetAllPartnerNoPagination   = errors.New("failed get all partner no pagination")
+	ErrGetAllPartnerWithPagination = errors.New("failed get all partner with pagination")
+	ErrPartnerAlreadyExists        = errors.New("failed partner already exists")
+	ErrUpdatePartner               = errors.New("failed update partner")
+	ErrDeletePartnerByID           = errors.New("failed delete partner by id")
 )
 
 // Authentiation for Admin
@@ -469,5 +495,31 @@ type (
 	CompetitionPaginationRepositoryResponse struct {
 		response.PaginationResponse
 		Competitions []entity.Competition
+	}
+)
+
+// Partner
+type (
+	PartnerResponse struct {
+		ID    string `json:"id"`
+		Name  string `json:"name"`
+		Image string `json:"image"`
+	}
+	CreatePartnerRequest struct {
+		Name  string `json:"name"`
+		Image string `json:"image"`
+	}
+	UpdatePartnerRequest struct {
+		ID    string `json:"-"`
+		Name  string `json:"name,omitempty"`
+		Image string `json:"image,omitempty"`
+	}
+	PartnerPaginationResponse struct {
+		response.PaginationResponse
+		Data []PartnerResponse `json:"data"`
+	}
+	PartnerPaginationRepositoryResponse struct {
+		response.PaginationResponse
+		Partners []entity.Partner
 	}
 )

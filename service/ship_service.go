@@ -97,10 +97,33 @@ func (as *shipService) Create(ctx context.Context, req dto.CreateShipRequest) (d
 			return dto.ErrCreateShip
 		}
 
-		// create ship images
-		for _, img := range shipImages {
-			if err := txRepo.CreateImage(ctx, nil, img); err != nil {
-				return dto.ErrCreateShipImage
+		// handle new image
+		if len(req.Name) > 0 {
+			// check request images
+			oldImages, err := txRepo.GetImagesByID(ctx, nil, ship.ID.String())
+			if err != nil {
+				return dto.ErrGetShipImages
+			}
+
+			// Delete Existing Ship Image
+			// in assets
+			for _, img := range oldImages {
+				name := strings.TrimPrefix(img.Name, "assets/")
+				path := filepath.Join("assets", name)
+				if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
+					return dto.ErrDeleteOldImage
+				}
+			}
+			// in db
+			if err := txRepo.DeleteImagesByID(ctx, nil, ship.ID.String()); err != nil {
+				return dto.ErrDeleteShipImageByShipID
+			}
+
+			// Create new ship images
+			for _, img := range shipImages {
+				if err := txRepo.CreateImage(ctx, nil, img); err != nil {
+					return dto.ErrCreateShipImage
+				}
 			}
 		}
 

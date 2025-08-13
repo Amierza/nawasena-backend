@@ -18,6 +18,8 @@ func Migrate(db *gorm.DB) error {
 		&entity.Competition{},
 		&entity.CompetitionImage{},
 
+		&entity.Partner{},
+
 		&entity.Position{},
 		&entity.Member{},
 	); err != nil {
