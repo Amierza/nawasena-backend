@@ -55,6 +55,11 @@ func main() {
 		achievementRepo    = repository.NewAchievementRepository(db)
 		achievementService = service.NewAchievementService(achievementRepo, jwt)
 		achievementHandler = handler.NewAchievementHandler(achievementService)
+
+		// Ship
+		shipRepo    = repository.NewShipRepository(db)
+		shipService = service.NewShipService(shipRepo, jwt)
+		shipHandler = handler.NewShipHandler(shipService)
 	)
 
 	server := gin.Default()
@@ -66,6 +71,7 @@ func main() {
 	routes.Position(server, positionHandler, jwt)
 	routes.Member(server, memberHandler, jwt)
 	routes.Achievement(server, achievementHandler, jwt)
+	routes.Ship(server, shipHandler, jwt)
 
 	server.Static("/assets", "./assets")
 
