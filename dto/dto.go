@@ -28,6 +28,10 @@ const (
 	MESSAGE_FAILED_FILES_IS_EMPTY       = "failed files is empty"
 	MESSAGE_FAILED_UPLOAD_FILES         = "failed upload files"
 
+	// Authentication
+	MESSAGE_FAILED_LOGIN_USER    = "failed login user"
+	MESSAGE_FAILED_REFRESH_TOKEN = "failed refresh token"
+
 	// Admin
 	MESSAGE_FAILED_CREATE_ADMIN     = "failed create admin"
 	MESSAGE_FAILED_GET_LIST_ADMIN   = "failed get all admin"
@@ -49,9 +53,12 @@ const (
 	MESSAGE_FAILED_UPDATE_MEMBER     = "failed update member"
 	MESSAGE_FAILED_DELETE_MEMBER     = "failed delete member"
 
-	// Authentication
-	MESSAGE_FAILED_LOGIN_USER    = "failed login user"
-	MESSAGE_FAILED_REFRESH_TOKEN = "failed refresh token"
+	// Achievement
+	MESSAGE_FAILED_CREATE_ACHIEVEMENT     = "failed create achievement"
+	MESSAGE_FAILED_GET_LIST_ACHIEVEMENT   = "failed get all achievement"
+	MESSAGE_FAILED_GET_DETAIL_ACHIEVEMENT = "failed get detail achievement"
+	MESSAGE_FAILED_UPDATE_ACHIEVEMENT     = "failed update achievement"
+	MESSAGE_FAILED_DELETE_ACHIEVEMENT     = "failed delete achievement"
 
 	// ====================================== Success ======================================
 	// File
@@ -81,6 +88,13 @@ const (
 	MESSAGE_SUCCESS_GET_DETAIL_MEMBER = "success get detail member"
 	MESSAGE_SUCCESS_UPDATE_MEMBER     = "success update member"
 	MESSAGE_SUCCESS_DELETE_MEMBER     = "success delete member"
+
+	// Achievement
+	MESSAGE_SUCCESS_CREATE_ACHIEVEMENT     = "success create achievement"
+	MESSAGE_SUCCESS_GET_LIST_ACHIEVEMENT   = "success get all achievement"
+	MESSAGE_SUCCESS_GET_DETAIL_ACHIEVEMENT = "success get detail achievement"
+	MESSAGE_SUCCESS_UPDATE_ACHIEVEMENT     = "success update achievement"
+	MESSAGE_SUCCESS_DELETE_ACHIEVEMENT     = "success delete achievement"
 )
 
 var (
@@ -101,18 +115,22 @@ var (
 	ErrDeniedAccess = errors.New("denied access")
 
 	// Input Validation
-	ErrEmptyEmail       = errors.New("email is required")
-	ErrEmptyPassword    = errors.New("password is required")
-	ErrEmptyName        = errors.New("name is required")
-	ErrNameTooShort     = errors.New("name must be at least 3 characters")
-	ErrEmptyDesc        = errors.New("description is required")
-	ErrDescTooShort     = errors.New("description must be at least 5 characters")
-	ErrEmptyImage       = errors.New("failed image is required")
-	ErrFormatImage      = errors.New("format image must be has prefix assets/")
-	ErrEmptyPhoneNumber = errors.New("failed phone number is required")
-	ErrEmptyMajor       = errors.New("failed major is required")
-	ErrEmptyGeneration  = errors.New("failed generation is required")
-	ErrTypeGeneration   = errors.New("failed generation is must be int")
+	ErrEmptyEmail          = errors.New("email is required")
+	ErrEmptyPassword       = errors.New("password is required")
+	ErrEmptyName           = errors.New("name is required")
+	ErrNameTooShort        = errors.New("name must be at least 3 characters")
+	ErrEmptyDesc           = errors.New("description is required")
+	ErrDescTooShort        = errors.New("description must be at least 5 characters")
+	ErrEmptyImage          = errors.New("failed image is required")
+	ErrFormatImage         = errors.New("format image must be has prefix assets/")
+	ErrEmptyPhoneNumber    = errors.New("failed phone number is required")
+	ErrEmptyMajor          = errors.New("failed major is required")
+	ErrEmptyGeneration     = errors.New("failed generation is required")
+	ErrTypeGeneration      = errors.New("failed generation is must be int")
+	ErrEmptyYear           = errors.New("failed year is required")
+	ErrEmptyDescription    = errors.New("failed description is required")
+	ErrDescriptionTooShort = errors.New("description must be at least 5 characters")
+	ErrEmptyImages         = errors.New("failed images is required")
 
 	// Phone Number
 	ErrFormatPhoneNumber = errors.New("failed format phone number")
@@ -165,6 +183,21 @@ var (
 	ErrMemberAlreadyExists        = errors.New("failed member already exists")
 	ErrUpdateMember               = errors.New("failed update member")
 	ErrDeleteMemberByID           = errors.New("failed delete member by id")
+
+	// Achievement
+	ErrGetAchievementByName                  = errors.New("failed get achievement by name")
+	ErrGetAchievementByID                    = errors.New("failed get achievement by id")
+	ErrGetAchievementImages                  = errors.New("failed get achievement images")
+	ErrAchievementNotFound                   = errors.New("achievement not found")
+	ErrCreateAchievement                     = errors.New("failed create achievement")
+	ErrCreateAchievementImage                = errors.New("failed create achievement image")
+	ErrGetAllAchievement                     = errors.New("failed get all achievement")
+	ErrGetAllAchievementNoPagination         = errors.New("failed get all achievement no pagination")
+	ErrGetAllAchievementWithPagination       = errors.New("failed get all achievement with pagination")
+	ErrAchievementAlreadyExists              = errors.New("failed achievement already exists")
+	ErrUpdateAchievement                     = errors.New("failed update achievement")
+	ErrDeleteAchievementByID                 = errors.New("failed delete achievement by id")
+	ErrDeleteAchievementImageByAchievementID = errors.New("failed delete achievement image by achievement id")
 )
 
 // Authentiation for Admin
@@ -273,5 +306,41 @@ type (
 	MemberPaginationRepositoryResponse struct {
 		response.PaginationResponse
 		Members []entity.Member
+	}
+)
+
+// Achievement
+type (
+	AchievementImageResponse struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+	}
+	AchievementResponse struct {
+		ID          string                     `json:"id"`
+		Name        string                     `json:"name"`
+		Year        int                        `json:"year"`
+		Description string                     `json:"description"`
+		Images      []AchievementImageResponse `json:"images"`
+	}
+	CreateAchievementRequest struct {
+		Name        string   `json:"name"`
+		Year        *int     `json:"year"`
+		Description string   `json:"description"`
+		Images      []string `json:"images"`
+	}
+	UpdateAchievementRequest struct {
+		ID          string   `json:"-"`
+		Name        string   `json:"name,omitempty"`
+		Year        *int     `json:"year,omitempty"`
+		Description string   `json:"description,omitempty"`
+		Images      []string `json:"images,omitempty"`
+	}
+	AchievementPaginationResponse struct {
+		response.PaginationResponse
+		Data []AchievementResponse `json:"data"`
+	}
+	AchievementPaginationRepositoryResponse struct {
+		response.PaginationResponse
+		Achievements []entity.Achievement
 	}
 )
