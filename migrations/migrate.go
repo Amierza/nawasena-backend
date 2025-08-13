@@ -12,6 +12,9 @@ func Migrate(db *gorm.DB) error {
 		&entity.Achievement{},
 		&entity.AchievementImage{},
 
+		&entity.Ship{},
+		&entity.ShipImage{},
+
 		&entity.Position{},
 		&entity.Member{},
 	); err != nil {

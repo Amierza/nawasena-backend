@@ -60,6 +60,13 @@ const (
 	MESSAGE_FAILED_UPDATE_ACHIEVEMENT     = "failed update achievement"
 	MESSAGE_FAILED_DELETE_ACHIEVEMENT     = "failed delete achievement"
 
+	// Ship
+	MESSAGE_FAILED_CREATE_SHIP     = "failed create ship"
+	MESSAGE_FAILED_GET_LIST_SHIP   = "failed get all ship"
+	MESSAGE_FAILED_GET_DETAIL_SHIP = "failed get detail ship"
+	MESSAGE_FAILED_UPDATE_SHIP     = "failed update ship"
+	MESSAGE_FAILED_DELETE_SHIP     = "failed delete ship"
+
 	// ====================================== Success ======================================
 	// File
 	MESSAGE_SUCCESS_UPLOAD_FILES = "success upload files"
@@ -95,6 +102,13 @@ const (
 	MESSAGE_SUCCESS_GET_DETAIL_ACHIEVEMENT = "success get detail achievement"
 	MESSAGE_SUCCESS_UPDATE_ACHIEVEMENT     = "success update achievement"
 	MESSAGE_SUCCESS_DELETE_ACHIEVEMENT     = "success delete achievement"
+
+	// Ship
+	MESSAGE_SUCCESS_CREATE_SHIP     = "success create ship"
+	MESSAGE_SUCCESS_GET_LIST_SHIP   = "success get all ship"
+	MESSAGE_SUCCESS_GET_DETAIL_SHIP = "success get detail ship"
+	MESSAGE_SUCCESS_UPDATE_SHIP     = "success update ship"
+	MESSAGE_SUCCESS_DELETE_SHIP     = "success delete ship"
 )
 
 var (
@@ -185,7 +199,6 @@ var (
 	ErrDeleteMemberByID           = errors.New("failed delete member by id")
 
 	// Achievement
-	ErrGetAchievementByName                  = errors.New("failed get achievement by name")
 	ErrGetAchievementByID                    = errors.New("failed get achievement by id")
 	ErrGetAchievementImages                  = errors.New("failed get achievement images")
 	ErrAchievementNotFound                   = errors.New("achievement not found")
@@ -198,6 +211,20 @@ var (
 	ErrUpdateAchievement                     = errors.New("failed update achievement")
 	ErrDeleteAchievementByID                 = errors.New("failed delete achievement by id")
 	ErrDeleteAchievementImageByAchievementID = errors.New("failed delete achievement image by achievement id")
+
+	// Ship
+	ErrGetShipByID              = errors.New("failed get ship by id")
+	ErrGetShipImages            = errors.New("failed get ship images")
+	ErrShipNotFound             = errors.New("ship not found")
+	ErrCreateShip               = errors.New("failed create ship")
+	ErrCreateShipImage          = errors.New("failed create ship image")
+	ErrGetAllShip               = errors.New("failed get all ship")
+	ErrGetAllShipNoPagination   = errors.New("failed get all ship no pagination")
+	ErrGetAllShipWithPagination = errors.New("failed get all ship with pagination")
+	ErrShipAlreadyExists        = errors.New("failed ship already exists")
+	ErrUpdateShip               = errors.New("failed update ship")
+	ErrDeleteShipByID           = errors.New("failed delete ship by id")
+	ErrDeleteShipImageByShipID  = errors.New("failed delete ship image by ship id")
 )
 
 // Authentiation for Admin
@@ -342,5 +369,38 @@ type (
 	AchievementPaginationRepositoryResponse struct {
 		response.PaginationResponse
 		Achievements []entity.Achievement
+	}
+)
+
+// Ship
+type (
+	ShipImageResponse struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+	}
+	ShipResponse struct {
+		ID          string              `json:"id"`
+		Name        string              `json:"name"`
+		Description string              `json:"description"`
+		Images      []ShipImageResponse `json:"images"`
+	}
+	CreateShipRequest struct {
+		Name        string   `json:"name"`
+		Description string   `json:"description"`
+		Images      []string `json:"images"`
+	}
+	UpdateShipRequest struct {
+		ID          string   `json:"-"`
+		Name        string   `json:"name,omitempty"`
+		Description string   `json:"description,omitempty"`
+		Images      []string `json:"images,omitempty"`
+	}
+	ShipPaginationResponse struct {
+		response.PaginationResponse
+		Data []ShipResponse `json:"data"`
+	}
+	ShipPaginationRepositoryResponse struct {
+		response.PaginationResponse
+		Ships []entity.Ship
 	}
 )
