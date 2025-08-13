@@ -67,6 +67,13 @@ const (
 	MESSAGE_FAILED_UPDATE_SHIP     = "failed update ship"
 	MESSAGE_FAILED_DELETE_SHIP     = "failed delete ship"
 
+	// Competition
+	MESSAGE_FAILED_CREATE_COMPETITION     = "failed create competition"
+	MESSAGE_FAILED_GET_LIST_COMPETITION   = "failed get all competition"
+	MESSAGE_FAILED_GET_DETAIL_COMPETITION = "failed get detail competition"
+	MESSAGE_FAILED_UPDATE_COMPETITION     = "failed update competition"
+	MESSAGE_FAILED_DELETE_COMPETITION     = "failed delete competition"
+
 	// ====================================== Success ======================================
 	// File
 	MESSAGE_SUCCESS_UPLOAD_FILES = "success upload files"
@@ -109,6 +116,13 @@ const (
 	MESSAGE_SUCCESS_GET_DETAIL_SHIP = "success get detail ship"
 	MESSAGE_SUCCESS_UPDATE_SHIP     = "success update ship"
 	MESSAGE_SUCCESS_DELETE_SHIP     = "success delete ship"
+
+	// Competition
+	MESSAGE_SUCCESS_CREATE_COMPETITION     = "success create competition"
+	MESSAGE_SUCCESS_GET_LIST_COMPETITION   = "success get all competition"
+	MESSAGE_SUCCESS_GET_DETAIL_COMPETITION = "success get detail competition"
+	MESSAGE_SUCCESS_UPDATE_COMPETITION     = "success update competition"
+	MESSAGE_SUCCESS_DELETE_COMPETITION     = "success delete competition"
 )
 
 var (
@@ -123,7 +137,9 @@ var (
 	ErrGetAdminRoleNameFromToken = errors.New("failed get admin role name from token")
 
 	// Parse
-	ErrParseUUID = errors.New("failed parse to uuid format")
+	ErrParseUUID                 = errors.New("failed parse to uuid format")
+	ErrParseTimeFromStringToTime = errors.New("failed parse time format from string to time.Time")
+	ErrParseTimeFromTimeToString = errors.New("failed parse time format from time.Time to string")
 
 	// Middleware
 	ErrDeniedAccess = errors.New("denied access")
@@ -145,6 +161,7 @@ var (
 	ErrEmptyDescription    = errors.New("failed description is required")
 	ErrDescriptionTooShort = errors.New("description must be at least 5 characters")
 	ErrEmptyImages         = errors.New("failed images is required")
+	ErrEmptyDate           = errors.New("failed date is required")
 
 	// Phone Number
 	ErrFormatPhoneNumber = errors.New("failed format phone number")
@@ -225,6 +242,20 @@ var (
 	ErrUpdateShip               = errors.New("failed update ship")
 	ErrDeleteShipByID           = errors.New("failed delete ship by id")
 	ErrDeleteShipImageByShipID  = errors.New("failed delete ship image by ship id")
+
+	// Competition
+	ErrGetCompetitionByID                    = errors.New("failed get competition by id")
+	ErrGetCompetitionImages                  = errors.New("failed get competition images")
+	ErrCompetitionNotFound                   = errors.New("competition not found")
+	ErrCreateCompetition                     = errors.New("failed create competition")
+	ErrCreateCompetitionImage                = errors.New("failed create competition image")
+	ErrGetAllCompetition                     = errors.New("failed get all competition")
+	ErrGetAllCompetitionNoPagination         = errors.New("failed get all competition no pagination")
+	ErrGetAllCompetitionWithPagination       = errors.New("failed get all competition with pagination")
+	ErrCompetitionAlreadyExists              = errors.New("failed competition already exists")
+	ErrUpdateCompetition                     = errors.New("failed update competition")
+	ErrDeleteCompetitionByID                 = errors.New("failed delete competition by id")
+	ErrDeleteCompetitionImageByCompetitionID = errors.New("failed delete competition image by ship id")
 )
 
 // Authentiation for Admin
@@ -402,5 +433,41 @@ type (
 	ShipPaginationRepositoryResponse struct {
 		response.PaginationResponse
 		Ships []entity.Ship
+	}
+)
+
+// Competition
+type (
+	CompetitionImageResponse struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+	}
+	CompetitionResponse struct {
+		ID          string                     `json:"id"`
+		Name        string                     `json:"name"`
+		Date        string                     `json:"date"`
+		Description string                     `json:"description"`
+		Images      []CompetitionImageResponse `json:"images"`
+	}
+	CreateCompetitionRequest struct {
+		Name        string   `json:"name"`
+		Date        string   `json:"date"`
+		Description string   `json:"description"`
+		Images      []string `json:"images"`
+	}
+	UpdateCompetitionRequest struct {
+		ID          string   `json:"-"`
+		Name        string   `json:"name,omitempty"`
+		Date        string   `json:"date,omitempty"`
+		Description string   `json:"description,omitempty"`
+		Images      []string `json:"images,omitempty"`
+	}
+	CompetitionPaginationResponse struct {
+		response.PaginationResponse
+		Data []CompetitionResponse `json:"data"`
+	}
+	CompetitionPaginationRepositoryResponse struct {
+		response.PaginationResponse
+		Competitions []entity.Competition
 	}
 )

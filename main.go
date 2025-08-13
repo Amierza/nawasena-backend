@@ -60,6 +60,11 @@ func main() {
 		shipRepo    = repository.NewShipRepository(db)
 		shipService = service.NewShipService(shipRepo, jwt)
 		shipHandler = handler.NewShipHandler(shipService)
+
+		// Competition
+		competitionRepo    = repository.NewCompetitionRepository(db)
+		competitionService = service.NewCompetitionService(competitionRepo, jwt)
+		competitionHandler = handler.NewCompetitionHandler(competitionService)
 	)
 
 	server := gin.Default()
@@ -72,6 +77,7 @@ func main() {
 	routes.Member(server, memberHandler, jwt)
 	routes.Achievement(server, achievementHandler, jwt)
 	routes.Ship(server, shipHandler, jwt)
+	routes.Competition(server, competitionHandler, jwt)
 
 	server.Static("/assets", "./assets")
 
