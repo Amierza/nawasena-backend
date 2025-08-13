@@ -45,6 +45,11 @@ func main() {
 		positionRepo    = repository.NewPositionRepository(db)
 		positionService = service.NewPositionService(positionRepo, jwt)
 		positionHandler = handler.NewPositionHandler(positionService)
+
+		// Member
+		memberRepo    = repository.NewMemberRepository(db)
+		memberService = service.NewMemberService(memberRepo, jwt)
+		memberHandler = handler.NewMemberHandler(memberService)
 	)
 
 	server := gin.Default()
@@ -54,6 +59,7 @@ func main() {
 	routes.File(server, fileHandler, jwt)
 	routes.Admin(server, adminHandler, jwt)
 	routes.Position(server, positionHandler, jwt)
+	routes.Member(server, memberHandler, jwt)
 
 	server.Static("/assets", "./assets")
 

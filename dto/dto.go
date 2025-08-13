@@ -42,6 +42,13 @@ const (
 	MESSAGE_FAILED_UPDATE_POSITION     = "failed update position"
 	MESSAGE_FAILED_DELETE_POSITION     = "failed delete position"
 
+	// Member
+	MESSAGE_FAILED_CREATE_MEMBER     = "failed create member"
+	MESSAGE_FAILED_GET_LIST_MEMBER   = "failed get all member"
+	MESSAGE_FAILED_GET_DETAIL_MEMBER = "failed get detail member"
+	MESSAGE_FAILED_UPDATE_MEMBER     = "failed update member"
+	MESSAGE_FAILED_DELETE_MEMBER     = "failed delete member"
+
 	// Authentication
 	MESSAGE_FAILED_LOGIN_USER    = "failed login user"
 	MESSAGE_FAILED_REFRESH_TOKEN = "failed refresh token"
@@ -67,6 +74,13 @@ const (
 	MESSAGE_SUCCESS_GET_DETAIL_POSITION = "success get detail position"
 	MESSAGE_SUCCESS_UPDATE_POSITION     = "success update position"
 	MESSAGE_SUCCESS_DELETE_POSITION     = "success delete position"
+
+	// Member
+	MESSAGE_SUCCESS_CREATE_MEMBER     = "success create member"
+	MESSAGE_SUCCESS_GET_LIST_MEMBER   = "success get all member"
+	MESSAGE_SUCCESS_GET_DETAIL_MEMBER = "success get detail member"
+	MESSAGE_SUCCESS_UPDATE_MEMBER     = "success update member"
+	MESSAGE_SUCCESS_DELETE_MEMBER     = "success delete member"
 )
 
 var (
@@ -80,6 +94,9 @@ var (
 	ErrGetAdminIDFromToken       = errors.New("failed get admin id from token")
 	ErrGetAdminRoleNameFromToken = errors.New("failed get admin role name from token")
 
+	// Parse
+	ErrParseUUID = errors.New("failed parse to uuid format")
+
 	// Middleware
 	ErrDeniedAccess = errors.New("denied access")
 
@@ -90,8 +107,12 @@ var (
 	ErrNameTooShort     = errors.New("name must be at least 3 characters")
 	ErrEmptyDesc        = errors.New("description is required")
 	ErrDescTooShort     = errors.New("description must be at least 5 characters")
-	ErrEmptyImages      = errors.New("failed image is required")
+	ErrEmptyImage       = errors.New("failed image is required")
+	ErrFormatImage      = errors.New("format image must be has prefix assets/")
 	ErrEmptyPhoneNumber = errors.New("failed phone number is required")
+	ErrEmptyMajor       = errors.New("failed major is required")
+	ErrEmptyGeneration  = errors.New("failed generation is required")
+	ErrTypeGeneration   = errors.New("failed generation is must be int")
 
 	// Phone Number
 	ErrFormatPhoneNumber = errors.New("failed format phone number")
@@ -123,6 +144,7 @@ var (
 
 	// Position
 	ErrGetPositionByName            = errors.New("failed get position by name")
+	ErrGetPositionByID              = errors.New("failed get position by id")
 	ErrPositionNotFound             = errors.New("position not found")
 	ErrCreatePosition               = errors.New("failed create position")
 	ErrGetAllPosition               = errors.New("failed get all position")
@@ -131,6 +153,18 @@ var (
 	ErrPositionAlreadyExists        = errors.New("failed position already exists")
 	ErrUpdatePosition               = errors.New("failed update position")
 	ErrDeletePositionByID           = errors.New("failed delete position by id")
+
+	// Member
+	ErrGetMemberByID              = errors.New("failed get member by id")
+	ErrGetMemberByName            = errors.New("failed get member by name")
+	ErrMemberNotFound             = errors.New("member not found")
+	ErrCreateMember               = errors.New("failed create member")
+	ErrGetAllMember               = errors.New("failed get all member")
+	ErrGetAllMemberNoPagination   = errors.New("failed get all member no pagination")
+	ErrGetAllMemberWithPagination = errors.New("failed get all member with pagination")
+	ErrMemberAlreadyExists        = errors.New("failed member already exists")
+	ErrUpdateMember               = errors.New("failed update member")
+	ErrDeleteMemberByID           = errors.New("failed delete member by id")
 )
 
 // Authentiation for Admin
@@ -204,5 +238,40 @@ type (
 	PositionPaginationRepositoryResponse struct {
 		response.PaginationResponse
 		Positions []entity.Position
+	}
+)
+
+// Member
+type (
+	MemberResponse struct {
+		ID         string           `json:"id"`
+		Name       string           `json:"name"`
+		Image      string           `json:"image"`
+		Major      string           `json:"major"`
+		Generation *int             `json:"generation"`
+		Position   PositionResponse `json:"position"`
+	}
+	CreateMemberRequest struct {
+		Name       string `json:"name"`
+		Image      string `json:"image"`
+		Major      string `json:"major"`
+		Generation *int   `json:"generation"`
+		PositionID string `json:"position_id"`
+	}
+	UpdateMemberRequest struct {
+		ID         string `json:"-"`
+		Name       string `json:"name,omitempty"`
+		Image      string `json:"image,omitempty"`
+		Major      string `json:"major,omitempty"`
+		Generation *int   `json:"generation,omitempty"`
+		PositionID string `json:"position_id,omitempty"`
+	}
+	MemberPaginationResponse struct {
+		response.PaginationResponse
+		Data []MemberResponse `json:"data"`
+	}
+	MemberPaginationRepositoryResponse struct {
+		response.PaginationResponse
+		Members []entity.Member
 	}
 )
