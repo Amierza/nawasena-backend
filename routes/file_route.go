@@ -10,6 +10,6 @@ import (
 func File(route *gin.Engine, fileHandler handler.IFileHandler, jwtService jwt.IJWT) {
 	routes := route.Group("/api/v1/uploads", middleware.Authentication(jwtService))
 	{
-		routes.POST("/", fileHandler.UploadFiles)
+		routes.POST("", fileHandler.UploadFiles)
 	}
 }

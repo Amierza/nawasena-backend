@@ -10,12 +10,12 @@ import (
 func Ship(route *gin.Engine, shipHandler handler.IShipHandler, jwtService jwt.IJWT) {
 	routes := route.Group("/api/v1/ships")
 	{
-		routes.GET("/", shipHandler.GetAll)
+		routes.GET("", shipHandler.GetAll)
 		routes.GET("/:id", shipHandler.GetDetail)
 
 		routes.Use(middleware.Authentication(jwtService))
 		{
-			routes.POST("/", shipHandler.Create)
+			routes.POST("", shipHandler.Create)
 			routes.PATCH("/:id", shipHandler.Update)
 			routes.DELETE("/:id", shipHandler.Delete)
 		}
