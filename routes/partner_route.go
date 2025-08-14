@@ -10,12 +10,12 @@ import (
 func Partner(route *gin.Engine, partnerHandler handler.IPartnerHandler, jwtService jwt.IJWT) {
 	routes := route.Group("/api/v1/partners")
 	{
-		routes.GET("/", partnerHandler.GetAll)
+		routes.GET("", partnerHandler.GetAll)
 		routes.GET("/:id", partnerHandler.GetDetail)
 
 		routes.Use(middleware.Authentication(jwtService))
 		{
-			routes.POST("/", partnerHandler.Create)
+			routes.POST("", partnerHandler.Create)
 			routes.PATCH("/:id", partnerHandler.Update)
 			routes.DELETE("/:id", partnerHandler.Delete)
 		}

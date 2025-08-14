@@ -10,12 +10,12 @@ import (
 func Achievement(route *gin.Engine, achievementHandler handler.IAchievementHandler, jwtService jwt.IJWT) {
 	routes := route.Group("/api/v1/achievements")
 	{
-		routes.GET("/", achievementHandler.GetAll)
+		routes.GET("", achievementHandler.GetAll)
 		routes.GET("/:id", achievementHandler.GetDetail)
 
 		routes.Use(middleware.Authentication(jwtService))
 		{
-			routes.POST("/", achievementHandler.Create)
+			routes.POST("", achievementHandler.Create)
 			routes.PATCH("/:id", achievementHandler.Update)
 			routes.DELETE("/:id", achievementHandler.Delete)
 		}

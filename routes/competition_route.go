@@ -10,12 +10,12 @@ import (
 func Competition(route *gin.Engine, competitionHandler handler.ICompetitionHandler, jwtService jwt.IJWT) {
 	routes := route.Group("/api/v1/competitions")
 	{
-		routes.GET("/", competitionHandler.GetAll)
+		routes.GET("", competitionHandler.GetAll)
 		routes.GET("/:id", competitionHandler.GetDetail)
 
 		routes.Use(middleware.Authentication(jwtService))
 		{
-			routes.POST("/", competitionHandler.Create)
+			routes.POST("", competitionHandler.Create)
 			routes.PATCH("/:id", competitionHandler.Update)
 			routes.DELETE("/:id", competitionHandler.Delete)
 		}
