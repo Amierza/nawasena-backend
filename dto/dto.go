@@ -74,6 +74,13 @@ const (
 	MESSAGE_FAILED_UPDATE_COMPETITION     = "failed update competition"
 	MESSAGE_FAILED_DELETE_COMPETITION     = "failed delete competition"
 
+	// News
+	MESSAGE_FAILED_CREATE_NEWS     = "failed create news"
+	MESSAGE_FAILED_GET_LIST_NEWS   = "failed get all news"
+	MESSAGE_FAILED_GET_DETAIL_NEWS = "failed get detail news"
+	MESSAGE_FAILED_UPDATE_NEWS     = "failed update news"
+	MESSAGE_FAILED_DELETE_NEWS     = "failed delete news"
+
 	// Partner
 	MESSAGE_FAILED_CREATE_PARTNER     = "failed create partner"
 	MESSAGE_FAILED_GET_LIST_PARTNER   = "failed get all partner"
@@ -130,6 +137,13 @@ const (
 	MESSAGE_SUCCESS_GET_DETAIL_COMPETITION = "success get detail competition"
 	MESSAGE_SUCCESS_UPDATE_COMPETITION     = "success update competition"
 	MESSAGE_SUCCESS_DELETE_COMPETITION     = "success delete competition"
+
+	// News
+	MESSAGE_SUCCESS_CREATE_NEWS     = "success create news"
+	MESSAGE_SUCCESS_GET_LIST_NEWS   = "success get all news"
+	MESSAGE_SUCCESS_GET_DETAIL_NEWS = "success get detail news"
+	MESSAGE_SUCCESS_UPDATE_NEWS     = "success update news"
+	MESSAGE_SUCCESS_DELETE_NEWS     = "success delete news"
 
 	// Partner
 	MESSAGE_SUCCESS_CREATE_PARTNER     = "success create partner"
@@ -270,6 +284,20 @@ var (
 	ErrUpdateCompetition                     = errors.New("failed update competition")
 	ErrDeleteCompetitionByID                 = errors.New("failed delete competition by id")
 	ErrDeleteCompetitionImageByCompetitionID = errors.New("failed delete competition image by ship id")
+
+	// News
+	ErrGetNewsByID              = errors.New("failed get news by id")
+	ErrGetNewsImages            = errors.New("failed get news images")
+	ErrNewsNotFound             = errors.New("news not found")
+	ErrCreateNews               = errors.New("failed create news")
+	ErrCreateNewsImage          = errors.New("failed create news image")
+	ErrGetAllNews               = errors.New("failed get all news")
+	ErrGetAllNewsNoPagination   = errors.New("failed get all news no pagination")
+	ErrGetAllNewsWithPagination = errors.New("failed get all news with pagination")
+	ErrNewsAlreadyExists        = errors.New("failed news already exists")
+	ErrUpdateNews               = errors.New("failed update news")
+	ErrDeleteNewsByID           = errors.New("failed delete news by id")
+	ErrDeleteNewsImageByNewsID  = errors.New("failed delete news image by news id")
 
 	// Partner
 	ErrGetPartnerByID              = errors.New("failed get partner by id")
@@ -495,6 +523,39 @@ type (
 	CompetitionPaginationRepositoryResponse struct {
 		response.PaginationResponse
 		Competitions []entity.Competition
+	}
+)
+
+// News
+type (
+	NewsImageResponse struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+	}
+	NewsResponse struct {
+		ID          string              `json:"id"`
+		Name        string              `json:"name"`
+		Description string              `json:"description"`
+		Images      []NewsImageResponse `json:"images"`
+	}
+	CreateNewsRequest struct {
+		Name        string   `json:"name"`
+		Description string   `json:"description"`
+		Images      []string `json:"images"`
+	}
+	UpdateNewsRequest struct {
+		ID          string   `json:"-"`
+		Name        string   `json:"name,omitempty"`
+		Description string   `json:"description,omitempty"`
+		Images      []string `json:"images,omitempty"`
+	}
+	NewsPaginationResponse struct {
+		response.PaginationResponse
+		Data []NewsResponse `json:"data"`
+	}
+	NewsPaginationRepositoryResponse struct {
+		response.PaginationResponse
+		Newss []entity.News
 	}
 )
 

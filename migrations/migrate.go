@@ -18,6 +18,9 @@ func Migrate(db *gorm.DB) error {
 		&entity.Competition{},
 		&entity.CompetitionImage{},
 
+		&entity.News{},
+		&entity.NewsImage{},
+
 		&entity.Partner{},
 
 		&entity.Position{},

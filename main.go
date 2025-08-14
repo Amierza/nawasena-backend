@@ -66,6 +66,11 @@ func main() {
 		competitionService = service.NewCompetitionService(competitionRepo, jwt)
 		competitionHandler = handler.NewCompetitionHandler(competitionService)
 
+		// News
+		newsRepo    = repository.NewNewsRepository(db)
+		newsService = service.NewNewsService(newsRepo, jwt)
+		newsHandler = handler.NewNewsHandler(newsService)
+
 		// Partner
 		partnerRepo    = repository.NewPartnerRepository(db)
 		partnerService = service.NewPartnerService(partnerRepo, jwt)
@@ -83,6 +88,7 @@ func main() {
 	routes.Achievement(server, achievementHandler, jwt)
 	routes.Ship(server, shipHandler, jwt)
 	routes.Competition(server, competitionHandler, jwt)
+	routes.News(server, newsHandler, jwt)
 	routes.Partner(server, partnerHandler, jwt)
 
 	server.Static("/assets", "./assets")
