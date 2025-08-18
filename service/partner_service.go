@@ -159,6 +159,7 @@ func (as *partnerService) Update(ctx context.Context, req dto.UpdatePartnerReque
 	}
 
 	// handle image request
+	oldImage := partner.Image
 	if req.Image != "" && req.Image != partner.Image {
 		partner.Image = req.Image
 	}
@@ -169,7 +170,7 @@ func (as *partnerService) Update(ctx context.Context, req dto.UpdatePartnerReque
 			return dto.ErrUpdatePartner
 		}
 
-		name := strings.TrimPrefix(partner.Image, "assets/")
+		name := strings.TrimPrefix(oldImage, "assets/")
 		path := filepath.Join("assets", name)
 		if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
 			return dto.ErrDeleteOldImage
