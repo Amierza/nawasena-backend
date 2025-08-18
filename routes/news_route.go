@@ -11,6 +11,7 @@ func News(route *gin.Engine, newsHandler handler.INewsHandler, jwtService jwt.IJ
 	routes := route.Group("/api/v1/news")
 	{
 		routes.GET("", newsHandler.GetAll)
+		routes.GET("/featured", newsHandler.GetFeatured)
 		routes.GET("/:id", newsHandler.GetDetail)
 
 		routes.Use(middleware.Authentication(jwtService))

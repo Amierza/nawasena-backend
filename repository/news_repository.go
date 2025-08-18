@@ -24,11 +24,14 @@ type (
 		GetByName(ctx context.Context, tx *gorm.DB, name string) (*entity.News, bool, error)
 		GetAll(ctx context.Context, tx *gorm.DB) ([]*entity.News, error)
 		GetAllWithPagination(ctx context.Context, tx *gorm.DB, req response.PaginationRequest) (dto.NewsPaginationRepositoryResponse, error)
+		GetFeatured(ctx context.Context, tx *gorm.DB, limit *int) ([]*entity.News, error)
 		GetByID(ctx context.Context, tx *gorm.DB, id string) (*entity.News, bool, error)
+		GetCategoryByCategoryID(ctx context.Context, tx *gorm.DB, categoryID string) (*entity.NewsCategory, bool, error)
 		GetImagesByID(ctx context.Context, tx *gorm.DB, id string) ([]*entity.NewsImage, error)
 
 		// UPDATE / PATCH
 		Update(ctx context.Context, tx *gorm.DB, news *entity.News) error
+		IncrementViews(ctx context.Context, tx *gorm.DB, id string) error
 
 		// DELETE / DELETE
 		DeleteByID(ctx context.Context, tx *gorm.DB, id string) error
@@ -46,33 +49,33 @@ func NewNewsRepository(db *gorm.DB) *newsRepository {
 	}
 }
 
-func (ar *newsRepository) RunInTransaction(ctx context.Context, fn func(txRepo INewsRepository) error) error {
-	return ar.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+func (nr *newsRepository) RunInTransaction(ctx context.Context, fn func(txRepo INewsRepository) error) error {
+	return nr.db.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
 		txRepo := &newsRepository{db: tx}
 		return fn(txRepo)
 	})
 }
 
 // CREATE / POST
-func (pr *newsRepository) Create(ctx context.Context, tx *gorm.DB, news *entity.News) error {
+func (nr *newsRepository) Create(ctx context.Context, tx *gorm.DB, news *entity.News) error {
 	if tx == nil {
-		tx = pr.db
+		tx = nr.db
 	}
 
 	return tx.WithContext(ctx).Create(&news).Error
 }
-func (pr *newsRepository) CreateImage(ctx context.Context, tx *gorm.DB, image *entity.NewsImage) error {
+func (nr *newsRepository) CreateImage(ctx context.Context, tx *gorm.DB, image *entity.NewsImage) error {
 	if tx == nil {
-		tx = pr.db
+		tx = nr.db
 	}
 
 	return tx.WithContext(ctx).Create(&image).Error
 }
 
 // READ / GET
-func (pr *newsRepository) GetByName(ctx context.Context, tx *gorm.DB, name string) (*entity.News, bool, error) {
+func (nr *newsRepository) GetByName(ctx context.Context, tx *gorm.DB, name string) (*entity.News, bool, error) {
 	if tx == nil {
-		tx = pr.db
+		tx = nr.db
 	}
 
 	var news *entity.News
@@ -86,9 +89,9 @@ func (pr *newsRepository) GetByName(ctx context.Context, tx *gorm.DB, name strin
 
 	return news, true, nil
 }
-func (pr *newsRepository) GetAll(ctx context.Context, tx *gorm.DB) ([]*entity.News, error) {
+func (nr *newsRepository) GetAll(ctx context.Context, tx *gorm.DB) ([]*entity.News, error) {
 	if tx == nil {
-		tx = pr.db
+		tx = nr.db
 	}
 
 	var (
@@ -96,16 +99,16 @@ func (pr *newsRepository) GetAll(ctx context.Context, tx *gorm.DB) ([]*entity.Ne
 		err   error
 	)
 
-	query := tx.WithContext(ctx).Model(&entity.News{}).Preload("Images")
+	query := tx.WithContext(ctx).Model(&entity.News{}).Preload("Images").Preload("NewsCategory")
 	if err := query.Order(`"created_at" DESC`).Find(&newss).Error; err != nil {
 		return []*entity.News{}, err
 	}
 
 	return newss, err
 }
-func (pr *newsRepository) GetAllWithPagination(ctx context.Context, tx *gorm.DB, req response.PaginationRequest) (dto.NewsPaginationRepositoryResponse, error) {
+func (nr *newsRepository) GetAllWithPagination(ctx context.Context, tx *gorm.DB, req response.PaginationRequest) (dto.NewsPaginationRepositoryResponse, error) {
 	if tx == nil {
-		tx = pr.db
+		tx = nr.db
 	}
 
 	var newss []entity.News
@@ -120,7 +123,7 @@ func (pr *newsRepository) GetAllWithPagination(ctx context.Context, tx *gorm.DB,
 		req.Page = 1
 	}
 
-	query := tx.WithContext(ctx).Model(&entity.News{}).Preload("Images")
+	query := tx.WithContext(ctx).Model(&entity.News{}).Preload("Images").Preload("NewsCategory")
 
 	if req.Search != "" {
 		searchValue := "%" + strings.ToLower(req.Search) + "%"
@@ -147,13 +150,54 @@ func (pr *newsRepository) GetAllWithPagination(ctx context.Context, tx *gorm.DB,
 		},
 	}, err
 }
-func (pr *newsRepository) GetByID(ctx context.Context, tx *gorm.DB, id string) (*entity.News, bool, error) {
+func (nr *newsRepository) GetFeatured(ctx context.Context, tx *gorm.DB, limit *int) ([]*entity.News, error) {
 	if tx == nil {
-		tx = pr.db
+		tx = nr.db
+	}
+
+	var news []*entity.News
+	query := tx.WithContext(ctx).Model(&entity.News{}).
+		Preload("Images").
+		Preload("NewsCategory").
+		Where("featured = ?", true).
+		Order("published_at DESC")
+
+	if limit != nil {
+		query = query.Limit(*limit)
+	}
+
+	if err := query.Find(&news).Error; err != nil {
+		return nil, err
+	}
+
+	// Kalau hasil kurang dari limit, ambil tambahan (fallback)
+	if limit != nil && len(news) < *limit {
+		remaining := *limit - len(news)
+
+		var fallback []*entity.News
+		err := tx.WithContext(ctx).Model(&entity.News{}).
+			Preload("Images").
+			Preload("NewsCategory").
+			Where("featured = ?", false). // jangan ambil yang udah featured
+			Order("views DESC").
+			Limit(remaining).
+			Find(&fallback).Error
+		if err != nil {
+			return nil, err
+		}
+
+		news = append(news, fallback...)
+	}
+
+	return news, nil
+}
+func (nr *newsRepository) GetByID(ctx context.Context, tx *gorm.DB, id string) (*entity.News, bool, error) {
+	if tx == nil {
+		tx = nr.db
 	}
 
 	var news *entity.News
-	err := tx.WithContext(ctx).Preload("Images").Where("id = ?", id).Take(&news).Error
+	err := tx.WithContext(ctx).Preload("Images").Preload("NewsCategory").Where("id = ?", id).Take(&news).Error
 	if err != nil {
 		return &entity.News{}, false, err
 	}
@@ -163,9 +207,25 @@ func (pr *newsRepository) GetByID(ctx context.Context, tx *gorm.DB, id string) (
 
 	return news, true, nil
 }
-func (ar *newsRepository) GetImagesByID(ctx context.Context, tx *gorm.DB, id string) ([]*entity.NewsImage, error) {
+func (nr *newsRepository) GetCategoryByCategoryID(ctx context.Context, tx *gorm.DB, categoryID string) (*entity.NewsCategory, bool, error) {
 	if tx == nil {
-		tx = ar.db
+		tx = nr.db
+	}
+
+	var news *entity.NewsCategory
+	err := tx.WithContext(ctx).Where("id = ?", categoryID).Take(&news).Error
+	if err != nil {
+		return &entity.NewsCategory{}, false, err
+	}
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return &entity.NewsCategory{}, false, nil
+	}
+
+	return news, true, nil
+}
+func (nr *newsRepository) GetImagesByID(ctx context.Context, tx *gorm.DB, id string) ([]*entity.NewsImage, error) {
+	if tx == nil {
+		tx = nr.db
 	}
 
 	query := tx.WithContext(ctx).
@@ -182,25 +242,35 @@ func (ar *newsRepository) GetImagesByID(ctx context.Context, tx *gorm.DB, id str
 }
 
 // UPDATE / PATCH
-func (pr *newsRepository) Update(ctx context.Context, tx *gorm.DB, news *entity.News) error {
+func (nr *newsRepository) Update(ctx context.Context, tx *gorm.DB, news *entity.News) error {
 	if tx == nil {
-		tx = pr.db
+		tx = nr.db
 	}
 
 	return tx.WithContext(ctx).Where("id = ?", news.ID).Updates(&news).Error
 }
+func (nr *newsRepository) IncrementViews(ctx context.Context, tx *gorm.DB, id string) error {
+	if tx == nil {
+		tx = nr.db
+	}
+
+	return tx.WithContext(ctx).
+		Model(&entity.News{}).
+		Where("id = ?", id).
+		UpdateColumn("views", gorm.Expr("views + ?", 1)).Error
+}
 
 // DELETE / DELETE
-func (pr *newsRepository) DeleteByID(ctx context.Context, tx *gorm.DB, id string) error {
+func (nr *newsRepository) DeleteByID(ctx context.Context, tx *gorm.DB, id string) error {
 	if tx == nil {
-		tx = pr.db
+		tx = nr.db
 	}
 
 	return tx.WithContext(ctx).Where("id = ?", id).Delete(&entity.News{}).Error
 }
-func (ar *newsRepository) DeleteImagesByID(ctx context.Context, tx *gorm.DB, id string) error {
+func (nr *newsRepository) DeleteImagesByID(ctx context.Context, tx *gorm.DB, id string) error {
 	if tx == nil {
-		tx = ar.db
+		tx = nr.db
 	}
 
 	return tx.WithContext(ctx).Where("news_id = ?", id).Delete(&entity.NewsImage{}).Error

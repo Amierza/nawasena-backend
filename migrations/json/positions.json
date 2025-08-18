@@ -1,22 +1,30 @@
 [
   {
-    "id": "81f33bf0-d8ec-4025-9d23-f47ae9048049",
+    "id": "3a003e64-510b-43b5-b51c-777f5b56d83d",
     "name": "General Manager"
   },
   {
-    "id": "114c9681-d365-479d-b2ee-a4281f489f12",
-    "name": "Non Technical Lead"
+    "id": "b6e9d265-0789-43a5-84a6-19d6341997de",
+    "name": "3D"
   },
   {
-    "id": "4b538962-1318-4629-9e74-b3c617b70a9a",
-    "name": "Non Technical"
+    "id": "7f10ed56-dbc9-48db-a62c-8d4a0cf92ed1",
+    "name": "Construction"
   },
   {
-    "id": "9cb0f91c-839a-434e-9748-bfa54d83fbce",
-    "name": "Technical Lead"
+    "id": "006ea4d2-cd51-4cda-a678-b7c29843a310",
+    "name": "General Arrangements"
   },
   {
-    "id": "473df188-8599-4de8-beb3-c615387a7d47",
-    "name": "Technical"
+    "id": "a31cedbe-8909-4dfd-8f45-21bdf3e83259",
+    "name": "Hull & Hydrodynamics"
+  },
+  {
+    "id": "65810d7e-28a1-44f5-91e3-b32733fef4a5",
+    "name": "Machinery & Electrical"
+  },
+  {
+    "id": "4d38e5ce-9dac-4fd2-9503-258d31b819bb",
+    "name": "Non-Techinal"
   }
 ]

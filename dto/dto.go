@@ -74,6 +74,13 @@ const (
 	MESSAGE_FAILED_UPDATE_COMPETITION     = "failed update competition"
 	MESSAGE_FAILED_DELETE_COMPETITION     = "failed delete competition"
 
+	// News Category
+	MESSAGE_FAILED_CREATE_NEWS_CATEGORY     = "failed create news category"
+	MESSAGE_FAILED_GET_LIST_NEWS_CATEGORY   = "failed get all news category"
+	MESSAGE_FAILED_GET_DETAIL_NEWS_CATEGORY = "failed get detail news category"
+	MESSAGE_FAILED_UPDATE_NEWS_CATEGORY     = "failed update news category"
+	MESSAGE_FAILED_DELETE_NEWS_CATEGORY     = "failed delete news category"
+
 	// News
 	MESSAGE_FAILED_CREATE_NEWS     = "failed create news"
 	MESSAGE_FAILED_GET_LIST_NEWS   = "failed get all news"
@@ -138,6 +145,13 @@ const (
 	MESSAGE_SUCCESS_UPDATE_COMPETITION     = "success update competition"
 	MESSAGE_SUCCESS_DELETE_COMPETITION     = "success delete competition"
 
+	// News Category
+	MESSAGE_SUCCESS_CREATE_NEWS_CATEGORY     = "success create news category"
+	MESSAGE_SUCCESS_GET_LIST_NEWS_CATEGORY   = "success get all news category"
+	MESSAGE_SUCCESS_GET_DETAIL_NEWS_CATEGORY = "success get detail news category"
+	MESSAGE_SUCCESS_UPDATE_NEWS_CATEGORY     = "success update news category"
+	MESSAGE_SUCCESS_DELETE_NEWS_CATEGORY     = "success delete news category"
+
 	// News
 	MESSAGE_SUCCESS_CREATE_NEWS     = "success create news"
 	MESSAGE_SUCCESS_GET_LIST_NEWS   = "success get all news"
@@ -166,6 +180,7 @@ var (
 
 	// Parse
 	ErrParseUUID                 = errors.New("failed parse to uuid format")
+	ErrParseLimit                = errors.New("failed parse limit to int")
 	ErrParseTimeFromStringToTime = errors.New("failed parse time format from string to time.Time")
 	ErrParseTimeFromTimeToString = errors.New("failed parse time format from time.Time to string")
 
@@ -190,6 +205,10 @@ var (
 	ErrDescriptionTooShort = errors.New("description must be at least 5 characters")
 	ErrEmptyImages         = errors.New("failed images is required")
 	ErrEmptyDate           = errors.New("failed date is required")
+	ErrEmptyLocation       = errors.New("failed location is required")
+	ErrLocationTooShort    = errors.New("location must be at least 5 characters")
+	ErrEmptyStatus         = errors.New("failed status is required")
+	ErrEmptyNewsCategory   = errors.New("failed news category is required")
 
 	// Phone Number
 	ErrFormatPhoneNumber = errors.New("failed format phone number")
@@ -285,13 +304,26 @@ var (
 	ErrDeleteCompetitionByID                 = errors.New("failed delete competition by id")
 	ErrDeleteCompetitionImageByCompetitionID = errors.New("failed delete competition image by ship id")
 
+	// News category
+	ErrGetNewsCategoryByName     = errors.New("failed get news category by name")
+	ErrGetNewsCategoryByID       = errors.New("failed get news category by id")
+	ErrNewsCategoryNotFound      = errors.New("news category not found")
+	ErrCreateNewsCategory        = errors.New("failed create news category")
+	ErrGetAllNewsCategory        = errors.New("failed get all news category")
+	ErrNewsCategoryAlreadyExists = errors.New("failed news category already exists")
+	ErrUpdateNewsCategory        = errors.New("failed update news category")
+	ErrDeleteNewsCategoryByID    = errors.New("failed delete news category by id")
+
 	// News
 	ErrGetNewsByID              = errors.New("failed get news by id")
 	ErrGetNewsImages            = errors.New("failed get news images")
 	ErrNewsNotFound             = errors.New("news not found")
+	ErrIncrementViews           = errors.New("failed increment views")
 	ErrCreateNews               = errors.New("failed create news")
 	ErrCreateNewsImage          = errors.New("failed create news image")
 	ErrGetAllNews               = errors.New("failed get all news")
+	ErrGetAllFeaturedNews       = errors.New("failed get all featured news")
+	ErrInvalidStatus            = errors.New("failed invalid status")
 	ErrGetAllNewsNoPagination   = errors.New("failed get all news no pagination")
 	ErrGetAllNewsWithPagination = errors.New("failed get all news with pagination")
 	ErrNewsAlreadyExists        = errors.New("failed news already exists")
@@ -526,6 +558,21 @@ type (
 	}
 )
 
+// NewsCategory
+type (
+	NewsCategoryResponse struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+	}
+	CreateNewsCategoryRequest struct {
+		Name string `json:"name"`
+	}
+	UpdateNewsCategoryRequest struct {
+		ID   string `json:"-"`
+		Name string `json:"name,omitempty"`
+	}
+)
+
 // News
 type (
 	NewsImageResponse struct {
@@ -533,20 +580,34 @@ type (
 		Name string `json:"name"`
 	}
 	NewsResponse struct {
-		ID          string              `json:"id"`
-		Name        string              `json:"name"`
-		Description string              `json:"description"`
-		Images      []NewsImageResponse `json:"images"`
+		ID          string               `json:"id"`
+		Name        string               `json:"name"`
+		Description string               `json:"description"`
+		PublishedAt string               `json:"published_at"`
+		Location    string               `json:"location"`
+		Status      string               `json:"status"` // Completed, Ongoing, Upcoming
+		Views       int                  `json:"views"`
+		Featured    bool                 `json:"featured"`
+		Category    NewsCategoryResponse `json:"category"`
+		Images      []NewsImageResponse  `json:"images"`
 	}
 	CreateNewsRequest struct {
 		Name        string   `json:"name"`
 		Description string   `json:"description"`
+		Location    string   `json:"location"`
+		Status      string   `json:"status"` // Completed, Ongoing, Upcoming
+		Featured    bool     `json:"featured"`
+		CategoryID  string   `json:"category_id"`
 		Images      []string `json:"images"`
 	}
 	UpdateNewsRequest struct {
 		ID          string   `json:"-"`
 		Name        string   `json:"name,omitempty"`
 		Description string   `json:"description,omitempty"`
+		Location    string   `json:"location,omitempty"`
+		Status      string   `json:"status,omitempty"` // Completed, Ongoing, Upcoming
+		Featured    bool     `json:"featured,omitempty"`
+		CategoryID  string   `json:"category_id,omitempty"`
 		Images      []string `json:"images,omitempty"`
 	}
 	NewsPaginationResponse struct {
