@@ -13,6 +13,7 @@ type (
 	INewsHandler interface {
 		Create(ctx *gin.Context)
 		GetAll(ctx *gin.Context)
+		GetFeatured(ctx *gin.Context)
 		GetDetail(ctx *gin.Context)
 		Update(ctx *gin.Context)
 		Delete(ctx *gin.Context)
@@ -87,6 +88,19 @@ func (ah *newsHandler) GetAll(ctx *gin.Context) {
 		Meta:     result.PaginationResponse,
 	}
 
+	ctx.JSON(http.StatusOK, res)
+}
+
+func (ah *newsHandler) GetFeatured(ctx *gin.Context) {
+	limit := ctx.Query("limit")
+	result, err := ah.newsService.GetFeatured(ctx, limit)
+	if err != nil {
+		res := response.BuildResponseFailed(dto.MESSAGE_FAILED_GET_DETAIL_NEWS, err.Error(), nil)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
+		return
+	}
+
+	res := response.BuildResponseSuccess(dto.MESSAGE_SUCCESS_GET_DETAIL_NEWS, result)
 	ctx.JSON(http.StatusOK, res)
 }
 

@@ -16,5 +16,10 @@ func Seed(db *gorm.DB) error {
 		return err
 	}
 
+	err = SeedFromJSON[entity.NewsCategory](db, "./migrations/json/news_categories.json", entity.NewsCategory{}, "Name")
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

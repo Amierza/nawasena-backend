@@ -7,7 +7,7 @@ type NewsImage struct {
 	Name string    `gorm:"type:varchar(150);not null" json:"name"`
 
 	NewsID *uuid.UUID `gorm:"type:uuid" json:"news_id,omitempty"`
-	News   News       `gorm:"foreignKey:NewsID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"news,omitempty"`
+	News   News       `gorm:"foreignKey:NewsID;references:ID;constraint:OnUpdate:CASCADE,OnDelete:CASCADE;" json:"news_image,omitempty"`
 
 	TimeStamp
 }

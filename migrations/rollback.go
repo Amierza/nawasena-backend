@@ -12,6 +12,7 @@ func Rollback(db *gorm.DB) error {
 
 		&entity.NewsImage{},
 		&entity.News{},
+		&entity.NewsCategory{},
 
 		&entity.Partner{},
 
