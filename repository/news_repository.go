@@ -247,7 +247,7 @@ func (nr *newsRepository) Update(ctx context.Context, tx *gorm.DB, news *entity.
 		tx = nr.db
 	}
 
-	return tx.WithContext(ctx).Where("id = ?", news.ID).Updates(&news).Error
+	return tx.WithContext(ctx).Model(&entity.News{}).Where("id = ?", news.ID).Updates(news).Error
 }
 func (nr *newsRepository) IncrementViews(ctx context.Context, tx *gorm.DB, id string) error {
 	if tx == nil {

@@ -11,6 +11,7 @@ func Achievement(route *gin.Engine, achievementHandler handler.IAchievementHandl
 	routes := route.Group("/api/v1/achievements")
 	{
 		routes.GET("", achievementHandler.GetAll)
+		routes.GET("/featured", achievementHandler.GetFeatured)
 		routes.GET("/:id", achievementHandler.GetDetail)
 
 		routes.Use(middleware.Authentication(jwtService))

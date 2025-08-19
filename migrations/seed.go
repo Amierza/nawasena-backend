@@ -21,5 +21,10 @@ func Seed(db *gorm.DB) error {
 		return err
 	}
 
+	err = SeedFromJSON[entity.AchievementCategory](db, "./migrations/json/achievement_categories.json", entity.AchievementCategory{}, "Name")
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
