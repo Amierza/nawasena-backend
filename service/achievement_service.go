@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/Amierza/nawasena-backend/dto"
@@ -20,6 +21,7 @@ type (
 		GetAll(ctx context.Context) ([]dto.AchievementResponse, error)
 		GetAllWithPagination(ctx context.Context, req response.PaginationRequest) (dto.AchievementPaginationResponse, error)
 		GetDetail(ctx context.Context, id string) (dto.AchievementResponse, error)
+		GetFeatured(ctx context.Context, limit string) ([]dto.AchievementResponse, error)
 		Update(ctx context.Context, req dto.UpdateAchievementRequest) (dto.AchievementResponse, error)
 		Delete(ctx context.Context, id string) (dto.AchievementResponse, error)
 	}
@@ -38,29 +40,29 @@ func NewAchievementService(achievementRepo repository.IAchievementRepository, jw
 }
 
 func (as *achievementService) Create(ctx context.Context, req dto.CreateAchievementRequest) (dto.AchievementResponse, error) {
-	// handle name request
-	if req.Name == "" {
-		return dto.AchievementResponse{}, dto.ErrEmptyName
-	}
+	// validate name
 	if len(req.Name) < 3 {
 		return dto.AchievementResponse{}, dto.ErrNameTooShort
 	}
 
-	// handle year request
-	if req.Year == nil {
-		return dto.AchievementResponse{}, dto.ErrEmptyYear
-	}
-
-	// handle description request
-	if req.Description == "" {
-		return dto.AchievementResponse{}, dto.ErrEmptyDescription
-	}
+	// validate description
 	if len(req.Description) < 5 {
 		return dto.AchievementResponse{}, dto.ErrDescriptionTooShort
 	}
 
+	// validate required arrays
+	if len(req.Images) == 0 {
+		return dto.AchievementResponse{}, dto.ErrEmptyImages
+	}
+	if len(req.Team) == 0 {
+		return dto.AchievementResponse{}, dto.ErrEmptyTeam
+	}
+	if len(req.Tags) == 0 {
+		return dto.AchievementResponse{}, dto.ErrEmptyTags
+	}
+
 	// handle double data
-	_, found, _ := as.achievementRepo.GetByNameAndYear(ctx, nil, req.Name, *req.Year)
+	_, found, _ := as.achievementRepo.GetByNameAndYear(ctx, nil, req.Name, req.Year)
 	if found {
 		return dto.AchievementResponse{}, dto.ErrAchievementAlreadyExists
 	}
@@ -69,9 +71,28 @@ func (as *achievementService) Create(ctx context.Context, req dto.CreateAchievem
 	achievement := &entity.Achievement{
 		ID:          achievementID,
 		Name:        req.Name,
-		Year:        *req.Year,
+		Year:        req.Year,
 		Description: req.Description,
+		Location:    req.Location,
+		Rank:        req.Rank,
+		Competition: req.Competition,
+		Team:        req.Team,
+		Impact:      req.Impact,
+		VideoURL:    req.VideoURL,
+		Featured:    req.Featured,
+		Tags:        req.Tags,
 	}
+
+	// handle category
+	category, found, _ := as.achievementRepo.GetCategoryByCategoryID(ctx, nil, req.CategoryID)
+	if !found {
+		return dto.AchievementResponse{}, dto.ErrAchievementCategoryNotFound
+	}
+	categoryUUID, err := uuid.Parse(req.CategoryID)
+	if err != nil {
+		return dto.AchievementResponse{}, dto.ErrParseUUID
+	}
+	achievement.AchievementCategoryID = &categoryUUID
 
 	// handle image url
 	var (
@@ -97,7 +118,7 @@ func (as *achievementService) Create(ctx context.Context, req dto.CreateAchievem
 		})
 	}
 
-	err := as.achievementRepo.RunInTransaction(ctx, func(txRepo repository.IAchievementRepository) error {
+	err = as.achievementRepo.RunInTransaction(ctx, func(txRepo repository.IAchievementRepository) error {
 		// create achievement
 		if err := txRepo.Create(ctx, nil, achievement); err != nil {
 			return dto.ErrCreateAchievement
@@ -121,7 +142,19 @@ func (as *achievementService) Create(ctx context.Context, req dto.CreateAchievem
 		Name:        achievement.Name,
 		Year:        achievement.Year,
 		Description: achievement.Description,
+		Location:    achievement.Location,
+		Rank:        achievement.Rank,
+		Competition: achievement.Competition,
+		Team:        achievement.Team,
+		Impact:      achievement.Impact,
+		VideoURL:    achievement.VideoURL,
+		Featured:    achievement.Featured,
+		Tags:        achievement.Tags,
 		Images:      achievementImageResponses,
+		Category: dto.AchievementCategoryResponse{
+			ID:   achievement.AchievementCategoryID.String(),
+			Name: category.Name,
+		},
 	}, nil
 }
 
@@ -138,6 +171,18 @@ func (as *achievementService) GetAll(ctx context.Context) ([]dto.AchievementResp
 			Name:        achievement.Name,
 			Year:        achievement.Year,
 			Description: achievement.Description,
+			Location:    achievement.Location,
+			Rank:        achievement.Rank,
+			Competition: achievement.Competition,
+			Team:        achievement.Team,
+			Impact:      achievement.Impact,
+			VideoURL:    achievement.VideoURL,
+			Featured:    achievement.Featured,
+			Tags:        achievement.Tags,
+			Category: dto.AchievementCategoryResponse{
+				ID:   achievement.AchievementCategoryID.String(),
+				Name: achievement.AchievementCategory.Name,
+			},
 		}
 
 		for _, a := range achievement.Images {
@@ -166,6 +211,18 @@ func (as *achievementService) GetAllWithPagination(ctx context.Context, req resp
 			Name:        achievement.Name,
 			Year:        achievement.Year,
 			Description: achievement.Description,
+			Location:    achievement.Location,
+			Rank:        achievement.Rank,
+			Competition: achievement.Competition,
+			Team:        achievement.Team,
+			Impact:      achievement.Impact,
+			VideoURL:    achievement.VideoURL,
+			Featured:    achievement.Featured,
+			Tags:        achievement.Tags,
+			Category: dto.AchievementCategoryResponse{
+				ID:   achievement.AchievementCategoryID.String(),
+				Name: achievement.AchievementCategory.Name,
+			},
 		}
 
 		for _, a := range achievement.Images {
@@ -200,6 +257,18 @@ func (as *achievementService) GetDetail(ctx context.Context, id string) (dto.Ach
 		Name:        achievement.Name,
 		Year:        achievement.Year,
 		Description: achievement.Description,
+		Location:    achievement.Location,
+		Rank:        achievement.Rank,
+		Competition: achievement.Competition,
+		Team:        achievement.Team,
+		Impact:      achievement.Impact,
+		VideoURL:    achievement.VideoURL,
+		Featured:    achievement.Featured,
+		Tags:        achievement.Tags,
+		Category: dto.AchievementCategoryResponse{
+			ID:   achievement.AchievementCategoryID.String(),
+			Name: achievement.AchievementCategory.Name,
+		},
 	}
 
 	for _, a := range achievement.Images {
@@ -210,6 +279,55 @@ func (as *achievementService) GetDetail(ctx context.Context, id string) (dto.Ach
 	}
 
 	return res, nil
+}
+
+func (ns *achievementService) GetFeatured(ctx context.Context, limit string) ([]dto.AchievementResponse, error) {
+	lim := 1 // default
+	if limit != "" {
+		if l, err := strconv.Atoi(limit); err == nil {
+			lim = l
+		} else {
+			return nil, dto.ErrParseLimit
+		}
+	}
+
+	featuredAchievement, err := ns.achievementRepo.GetFeatured(ctx, nil, &lim)
+	if err != nil {
+		return nil, dto.ErrGetAllFeaturedAchievement
+	}
+
+	var datas []dto.AchievementResponse
+	for _, achievement := range featuredAchievement {
+		data := dto.AchievementResponse{
+			ID:          achievement.ID.String(),
+			Name:        achievement.Name,
+			Year:        achievement.Year,
+			Description: achievement.Description,
+			Location:    achievement.Location,
+			Rank:        achievement.Rank,
+			Competition: achievement.Competition,
+			Team:        achievement.Team,
+			Impact:      achievement.Impact,
+			VideoURL:    achievement.VideoURL,
+			Featured:    achievement.Featured,
+			Tags:        achievement.Tags,
+			Category: dto.AchievementCategoryResponse{
+				ID:   achievement.AchievementCategoryID.String(),
+				Name: achievement.AchievementCategory.Name,
+			},
+		}
+
+		for _, a := range achievement.Images {
+			data.Images = append(data.Images, dto.AchievementImageResponse{
+				ID:   a.ID.String(),
+				Name: a.Name,
+			})
+		}
+
+		datas = append(datas, data)
+	}
+
+	return datas, nil
 }
 
 func (as *achievementService) Update(ctx context.Context, req dto.UpdateAchievementRequest) (dto.AchievementResponse, error) {
@@ -223,11 +341,7 @@ func (as *achievementService) Update(ctx context.Context, req dto.UpdateAchievem
 	}
 
 	// handle name request
-	if req.Name != "" && req.Name != achievement.Name {
-		if len(req.Name) < 3 {
-			return dto.AchievementResponse{}, dto.ErrNameTooShort
-		}
-
+	if req.Name != "" {
 		achievement.Name = req.Name
 	}
 
@@ -237,12 +351,53 @@ func (as *achievementService) Update(ctx context.Context, req dto.UpdateAchievem
 	}
 
 	// handle description request
-	if req.Description != "" && req.Description != achievement.Description {
-		if len(req.Description) < 5 {
-			return dto.AchievementResponse{}, dto.ErrDescriptionTooShort
+	if req.Description != "" {
+		achievement.Description = req.Description
+	}
+
+	// handle other optional fields
+	if req.Location != "" {
+		achievement.Location = req.Location
+	}
+
+	if req.Rank != "" {
+		achievement.Rank = req.Rank
+	}
+
+	if req.Competition != "" {
+		achievement.Competition = req.Competition
+	}
+
+	if len(req.Team) > 0 {
+		achievement.Team = req.Team
+	}
+
+	if req.Impact != "" {
+		achievement.Impact = req.Impact
+	}
+
+	if req.VideoURL != "" {
+		achievement.VideoURL = req.VideoURL
+	}
+
+	achievement.Featured = req.Featured
+
+	if len(req.Tags) > 0 {
+		achievement.Tags = req.Tags
+	}
+
+	// handle category
+	if req.CategoryID != "" {
+		_, found, _ := as.achievementRepo.GetCategoryByCategoryID(ctx, nil, req.CategoryID)
+		if !found {
+			return dto.AchievementResponse{}, dto.ErrAchievementCategoryNotFound
 		}
 
-		achievement.Description = req.Description
+		categoryUUID, err := uuid.Parse(req.CategoryID)
+		if err != nil {
+			return dto.AchievementResponse{}, dto.ErrParseUUID
+		}
+		achievement.AchievementCategoryID = &categoryUUID
 	}
 
 	// handle image url
@@ -313,7 +468,19 @@ func (as *achievementService) Update(ctx context.Context, req dto.UpdateAchievem
 		Name:        achievement.Name,
 		Year:        achievement.Year,
 		Description: achievement.Description,
+		Location:    achievement.Location,
+		Rank:        achievement.Rank,
+		Competition: achievement.Competition,
+		Team:        achievement.Team,
+		Impact:      achievement.Impact,
+		VideoURL:    achievement.VideoURL,
+		Featured:    achievement.Featured,
+		Tags:        achievement.Tags,
 		Images:      achievementImageResponses,
+		Category: dto.AchievementCategoryResponse{
+			ID:   achievement.AchievementCategoryID.String(),
+			Name: achievement.AchievementCategory.Name,
+		},
 	}, nil
 }
 
@@ -360,6 +527,18 @@ func (as *achievementService) Delete(ctx context.Context, id string) (dto.Achiev
 		Name:        deletedAchievement.Name,
 		Year:        deletedAchievement.Year,
 		Description: deletedAchievement.Description,
+		Location:    deletedAchievement.Location,
+		Rank:        deletedAchievement.Rank,
+		Competition: deletedAchievement.Competition,
+		Team:        deletedAchievement.Team,
+		Impact:      deletedAchievement.Impact,
+		VideoURL:    deletedAchievement.VideoURL,
+		Featured:    deletedAchievement.Featured,
+		Tags:        deletedAchievement.Tags,
+		Category: dto.AchievementCategoryResponse{
+			ID:   deletedAchievement.AchievementCategoryID.String(),
+			Name: deletedAchievement.AchievementCategory.Name,
+		},
 	}
 
 	for _, a := range deletedAchievement.Images {

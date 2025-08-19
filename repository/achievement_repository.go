@@ -25,6 +25,8 @@ type (
 		GetAll(ctx context.Context, tx *gorm.DB) ([]*entity.Achievement, error)
 		GetAllWithPagination(ctx context.Context, tx *gorm.DB, req response.PaginationRequest) (dto.AchievementPaginationRepositoryResponse, error)
 		GetByID(ctx context.Context, tx *gorm.DB, id string) (*entity.Achievement, bool, error)
+		GetCategoryByCategoryID(ctx context.Context, tx *gorm.DB, categoryID string) (*entity.AchievementCategory, bool, error)
+		GetFeatured(ctx context.Context, tx *gorm.DB, limit *int) ([]*entity.Achievement, error)
 		GetImagesByID(ctx context.Context, tx *gorm.DB, id string) ([]*entity.AchievementImage, error)
 
 		// UPDATE / PATCH
@@ -96,7 +98,7 @@ func (pr *achievementRepository) GetAll(ctx context.Context, tx *gorm.DB) ([]*en
 		err          error
 	)
 
-	query := tx.WithContext(ctx).Model(&entity.Achievement{}).Preload("Images")
+	query := tx.WithContext(ctx).Model(&entity.Achievement{}).Preload("Images").Preload("AchievementCategory")
 	if err := query.Order(`"created_at" DESC`).Find(&achievements).Error; err != nil {
 		return []*entity.Achievement{}, err
 	}
@@ -120,7 +122,7 @@ func (pr *achievementRepository) GetAllWithPagination(ctx context.Context, tx *g
 		req.Page = 1
 	}
 
-	query := tx.WithContext(ctx).Model(&entity.Achievement{}).Preload("Images")
+	query := tx.WithContext(ctx).Model(&entity.Achievement{}).Preload("Images").Preload("AchievementCategory")
 
 	if req.Search != "" {
 		searchValue := "%" + strings.ToLower(req.Search) + "%"
@@ -153,7 +155,7 @@ func (pr *achievementRepository) GetByID(ctx context.Context, tx *gorm.DB, id st
 	}
 
 	var achievement *entity.Achievement
-	err := tx.WithContext(ctx).Preload("Images").Where("id = ?", id).Take(&achievement).Error
+	err := tx.WithContext(ctx).Preload("Images").Preload("AchievementCategory").Where("id = ?", id).Take(&achievement).Error
 	if err != nil {
 		return &entity.Achievement{}, false, err
 	}
@@ -162,6 +164,63 @@ func (pr *achievementRepository) GetByID(ctx context.Context, tx *gorm.DB, id st
 	}
 
 	return achievement, true, nil
+}
+func (ar *achievementRepository) GetCategoryByCategoryID(ctx context.Context, tx *gorm.DB, categoryID string) (*entity.AchievementCategory, bool, error) {
+	if tx == nil {
+		tx = ar.db
+	}
+
+	var achievement *entity.AchievementCategory
+	err := tx.WithContext(ctx).Where("id = ?", categoryID).Take(&achievement).Error
+	if err != nil {
+		return &entity.AchievementCategory{}, false, err
+	}
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return &entity.AchievementCategory{}, false, nil
+	}
+
+	return achievement, true, nil
+}
+func (ar *achievementRepository) GetFeatured(ctx context.Context, tx *gorm.DB, limit *int) ([]*entity.Achievement, error) {
+	if tx == nil {
+		tx = ar.db
+	}
+
+	var achievement []*entity.Achievement
+	query := tx.WithContext(ctx).Model(&entity.Achievement{}).
+		Preload("Images").
+		Preload("AchievementCategory").
+		Where("featured = ?", true).
+		Order("created_at DESC")
+
+	if limit != nil {
+		query = query.Limit(*limit)
+	}
+
+	if err := query.Find(&achievement).Error; err != nil {
+		return nil, err
+	}
+
+	// Kalau hasil kurang dari limit, ambil tambahan (fallback)
+	if limit != nil && len(achievement) < *limit {
+		remaining := *limit - len(achievement)
+
+		var fallback []*entity.Achievement
+		err := tx.WithContext(ctx).Model(&entity.Achievement{}).
+			Preload("Images").
+			Preload("AchievementCategory").
+			Where("featured = ?", false). // jangan ambil yang udah featured
+			Order("created_at DESC").
+			Limit(remaining).
+			Find(&fallback).Error
+		if err != nil {
+			return nil, err
+		}
+
+		achievement = append(achievement, fallback...)
+	}
+
+	return achievement, nil
 }
 func (ar *achievementRepository) GetImagesByID(ctx context.Context, tx *gorm.DB, id string) ([]*entity.AchievementImage, error) {
 	if tx == nil {
@@ -182,18 +241,18 @@ func (ar *achievementRepository) GetImagesByID(ctx context.Context, tx *gorm.DB,
 }
 
 // UPDATE / PATCH
-func (pr *achievementRepository) Update(ctx context.Context, tx *gorm.DB, achievement *entity.Achievement) error {
+func (ar *achievementRepository) Update(ctx context.Context, tx *gorm.DB, achievement *entity.Achievement) error {
 	if tx == nil {
-		tx = pr.db
+		tx = ar.db
 	}
 
-	return tx.WithContext(ctx).Where("id = ?", achievement.ID).Updates(&achievement).Error
+	return tx.WithContext(ctx).Model(&entity.Achievement{}).Where("id = ?", achievement.ID).Updates(achievement).Error
 }
 
 // DELETE / DELETE
-func (pr *achievementRepository) DeleteByID(ctx context.Context, tx *gorm.DB, id string) error {
+func (ar *achievementRepository) DeleteByID(ctx context.Context, tx *gorm.DB, id string) error {
 	if tx == nil {
-		tx = pr.db
+		tx = ar.db
 	}
 
 	return tx.WithContext(ctx).Where("id = ?", id).Delete(&entity.Achievement{}).Error

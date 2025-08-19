@@ -51,6 +51,11 @@ func main() {
 		memberService = service.NewMemberService(memberRepo, jwt)
 		memberHandler = handler.NewMemberHandler(memberService)
 
+		// Achievement Category
+		achievementCategoryRepo    = repository.NewAchievementCategoryRepository(db)
+		achievementCategoryService = service.NewAchievementCategoryService(achievementCategoryRepo, jwt)
+		achievementCategoryHandler = handler.NewAchievementCategoryHandler(achievementCategoryService)
+
 		// Achievement
 		achievementRepo    = repository.NewAchievementRepository(db)
 		achievementService = service.NewAchievementService(achievementRepo, jwt)
@@ -90,6 +95,7 @@ func main() {
 	routes.Admin(server, adminHandler, jwt)
 	routes.Position(server, positionHandler, jwt)
 	routes.Member(server, memberHandler, jwt)
+	routes.AchievementCategory(server, achievementCategoryHandler, jwt)
 	routes.Achievement(server, achievementHandler, jwt)
 	routes.Ship(server, shipHandler, jwt)
 	routes.Competition(server, competitionHandler, jwt)

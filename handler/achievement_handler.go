@@ -14,6 +14,7 @@ type (
 		Create(ctx *gin.Context)
 		GetAll(ctx *gin.Context)
 		GetDetail(ctx *gin.Context)
+		GetFeatured(ctx *gin.Context)
 		Update(ctx *gin.Context)
 		Delete(ctx *gin.Context)
 	}
@@ -93,6 +94,19 @@ func (ah *achievementHandler) GetAll(ctx *gin.Context) {
 func (ah *achievementHandler) GetDetail(ctx *gin.Context) {
 	idStr := ctx.Param("id")
 	result, err := ah.achievementService.GetDetail(ctx, idStr)
+	if err != nil {
+		res := response.BuildResponseFailed(dto.MESSAGE_FAILED_GET_DETAIL_ACHIEVEMENT, err.Error(), nil)
+		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
+		return
+	}
+
+	res := response.BuildResponseSuccess(dto.MESSAGE_SUCCESS_GET_DETAIL_ACHIEVEMENT, result)
+	ctx.JSON(http.StatusOK, res)
+}
+
+func (ah *achievementHandler) GetFeatured(ctx *gin.Context) {
+	limit := ctx.Query("limit")
+	result, err := ah.achievementService.GetFeatured(ctx, limit)
 	if err != nil {
 		res := response.BuildResponseFailed(dto.MESSAGE_FAILED_GET_DETAIL_ACHIEVEMENT, err.Error(), nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)

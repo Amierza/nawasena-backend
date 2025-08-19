@@ -53,6 +53,13 @@ const (
 	MESSAGE_FAILED_UPDATE_MEMBER     = "failed update member"
 	MESSAGE_FAILED_DELETE_MEMBER     = "failed delete member"
 
+	// Achievement Category
+	MESSAGE_FAILED_CREATE_ACHIEVEMENT_CATEGORY     = "failed create achievement category"
+	MESSAGE_FAILED_GET_LIST_ACHIEVEMENT_CATEGORY   = "failed get all achievement category"
+	MESSAGE_FAILED_GET_DETAIL_ACHIEVEMENT_CATEGORY = "failed get detail achievement category"
+	MESSAGE_FAILED_UPDATE_ACHIEVEMENT_CATEGORY     = "failed update achievement category"
+	MESSAGE_FAILED_DELETE_ACHIEVEMENT_CATEGORY     = "failed delete achievement category"
+
 	// Achievement
 	MESSAGE_FAILED_CREATE_ACHIEVEMENT     = "failed create achievement"
 	MESSAGE_FAILED_GET_LIST_ACHIEVEMENT   = "failed get all achievement"
@@ -123,6 +130,13 @@ const (
 	MESSAGE_SUCCESS_GET_DETAIL_MEMBER = "success get detail member"
 	MESSAGE_SUCCESS_UPDATE_MEMBER     = "success update member"
 	MESSAGE_SUCCESS_DELETE_MEMBER     = "success delete member"
+
+	// Achievement Category
+	MESSAGE_SUCCESS_CREATE_ACHIEVEMENT_CATEGORY     = "success create achievement category"
+	MESSAGE_SUCCESS_GET_LIST_ACHIEVEMENT_CATEGORY   = "success get all achievement category"
+	MESSAGE_SUCCESS_GET_DETAIL_ACHIEVEMENT_CATEGORY = "success get detail achievement category"
+	MESSAGE_SUCCESS_UPDATE_ACHIEVEMENT_CATEGORY     = "success update achievement category"
+	MESSAGE_SUCCESS_DELETE_ACHIEVEMENT_CATEGORY     = "success delete achievement category"
 
 	// Achievement
 	MESSAGE_SUCCESS_CREATE_ACHIEVEMENT     = "success create achievement"
@@ -209,6 +223,8 @@ var (
 	ErrLocationTooShort    = errors.New("location must be at least 5 characters")
 	ErrEmptyStatus         = errors.New("failed status is required")
 	ErrEmptyNewsCategory   = errors.New("failed news category is required")
+	ErrEmptyTeam           = errors.New("failed team is required")
+	ErrEmptyTags           = errors.New("failed tags is required")
 
 	// Phone Number
 	ErrFormatPhoneNumber = errors.New("failed format phone number")
@@ -262,10 +278,21 @@ var (
 	ErrUpdateMember               = errors.New("failed update member")
 	ErrDeleteMemberByID           = errors.New("failed delete member by id")
 
+	// Achievement category
+	ErrGetAchievementCategoryByName     = errors.New("failed get achievement category by name")
+	ErrGetAchievementCategoryByID       = errors.New("failed get achievement category by id")
+	ErrAchievementCategoryNotFound      = errors.New("achievement category not found")
+	ErrCreateAchievementCategory        = errors.New("failed create achievement category")
+	ErrGetAllAchievementCategory        = errors.New("failed get all achievement category")
+	ErrAchievementCategoryAlreadyExists = errors.New("failed achievement category already exists")
+	ErrUpdateAchievementCategory        = errors.New("failed update achievement category")
+	ErrDeleteAchievementCategoryByID    = errors.New("failed delete achievement category by id")
+
 	// Achievement
 	ErrGetAchievementByID                    = errors.New("failed get achievement by id")
 	ErrGetAchievementImages                  = errors.New("failed get achievement images")
 	ErrAchievementNotFound                   = errors.New("achievement not found")
+	ErrGetAllFeaturedAchievement             = errors.New("failed get all featured achievement")
 	ErrCreateAchievement                     = errors.New("failed create achievement")
 	ErrCreateAchievementImage                = errors.New("failed create achievement image")
 	ErrGetAllAchievement                     = errors.New("failed get all achievement")
@@ -453,6 +480,21 @@ type (
 	}
 )
 
+// AchievementCategory
+type (
+	AchievementCategoryResponse struct {
+		ID   string `json:"id"`
+		Name string `json:"name"`
+	}
+	CreateAchievementCategoryRequest struct {
+		Name string `json:"name"`
+	}
+	UpdateAchievementCategoryRequest struct {
+		ID   string `json:"-"`
+		Name string `json:"name,omitempty"`
+	}
+)
+
 // Achievement
 type (
 	AchievementImageResponse struct {
@@ -460,24 +502,51 @@ type (
 		Name string `json:"name"`
 	}
 	AchievementResponse struct {
-		ID          string                     `json:"id"`
-		Name        string                     `json:"name"`
-		Year        int                        `json:"year"`
-		Description string                     `json:"description"`
-		Images      []AchievementImageResponse `json:"images"`
+		ID          string                      `json:"id"`
+		Name        string                      `json:"name"`
+		Year        int                         `json:"year"`
+		Description string                      `json:"description"`
+		Location    string                      `json:"location"`
+		Rank        string                      `json:"rank"`
+		Competition string                      `json:"competition"`
+		Team        []string                    `json:"team"`
+		Impact      string                      `json:"impact"`
+		VideoURL    string                      `json:"video_url"`
+		Featured    bool                        `json:"featured"`
+		Tags        []string                    `json:"tags"`
+		Images      []AchievementImageResponse  `json:"images"`
+		Category    AchievementCategoryResponse `json:"category"`
 	}
 	CreateAchievementRequest struct {
-		Name        string   `json:"name"`
-		Year        *int     `json:"year"`
-		Description string   `json:"description"`
-		Images      []string `json:"images"`
+		Name        string   `json:"name" binding:"required"`
+		Year        int      `json:"year" binding:"required"`
+		Description string   `json:"description" binding:"required"`
+		Location    string   `json:"location" binding:"required"`
+		Rank        string   `json:"rank" binding:"required"`
+		Competition string   `json:"competition" binding:"required"`
+		Team        []string `json:"team" binding:"required"`
+		Impact      string   `json:"impact" binding:"required"`
+		VideoURL    string   `json:"video_url"`
+		Featured    bool     `json:"featured"`
+		Tags        []string `json:"tags" binding:"required"`
+		Images      []string `json:"images" binding:"required"`
+		CategoryID  string   `json:"category_id" binding:"required"`
 	}
 	UpdateAchievementRequest struct {
 		ID          string   `json:"-"`
 		Name        string   `json:"name,omitempty"`
 		Year        *int     `json:"year,omitempty"`
 		Description string   `json:"description,omitempty"`
+		Location    string   `json:"location,omitempty"`
+		Rank        string   `json:"rank,omitempty"`
+		Competition string   `json:"competition,omitempty"`
+		Team        []string `json:"team,omitempty"`
+		Impact      string   `json:"impact,omitempty"`
+		VideoURL    string   `json:"video_url,omitempty"`
+		Featured    bool     `json:"featured,omitempty"`
+		Tags        []string `json:"tags,omitempty"`
 		Images      []string `json:"images,omitempty"`
+		CategoryID  string   `json:"category_id,omitempty"`
 	}
 	AchievementPaginationResponse struct {
 		response.PaginationResponse

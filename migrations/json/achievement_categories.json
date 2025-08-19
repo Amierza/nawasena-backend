@@ -1,0 +1,22 @@
+[
+  {
+    "id": "7378febe-f59b-45d5-92b7-4010b2ba5bc4",
+    "name": "International"
+  },
+  {
+    "id": "e7bc84c6-41b2-4666-a1ff-d7765eec45ca",
+    "name": "National"
+  },
+  {
+    "id": "86d98591-40e7-4479-ab5c-7e27467814f7",
+    "name": "Research"
+  },
+  {
+    "id": "3cfd213a-2f2d-4413-a9cd-de8db76576ab",
+    "name": "Innovation"
+  },
+  {
+    "id": "d916cf79-d78f-4f97-9b25-fcb6d5516c00",
+    "name": "Partnership"
+  }
+]
