@@ -12,6 +12,7 @@ type News struct {
 	Description string    `json:"description"`
 	PublishedAt time.Time `gorm:"type:timestamp;not null" json:"date"`
 	Location    string    `json:"location"`
+	URL         string    `json:"url"`
 	Status      string    `gorm:"type:varchar(50)" json:"status"`
 	Views       int       `gorm:"default:0" json:"views"`
 	Featured    bool      `gorm:"default:false" json:"featured"`

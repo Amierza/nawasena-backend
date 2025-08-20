@@ -103,6 +103,7 @@ func (ns *newsService) Create(ctx context.Context, req dto.CreateNewsRequest) (d
 		Description:    req.Description,
 		PublishedAt:    publishedAt,
 		Location:       req.Location,
+		URL:            req.URL,
 		Status:         req.Status,
 		Featured:       req.Featured,
 		NewsCategoryID: &categoryID,
@@ -180,6 +181,7 @@ func (ns *newsService) Create(ctx context.Context, req dto.CreateNewsRequest) (d
 		Description: news.Description,
 		PublishedAt: news.PublishedAt.String(),
 		Location:    news.Location,
+		URL:         news.URL,
 		Status:      news.Status,
 		Views:       news.Views,
 		Featured:    news.Featured,
@@ -205,6 +207,7 @@ func (ns *newsService) GetAll(ctx context.Context) ([]dto.NewsResponse, error) {
 			Description: news.Description,
 			PublishedAt: news.PublishedAt.String(),
 			Location:    news.Location,
+			URL:         news.URL,
 			Status:      news.Status,
 			Views:       news.Views,
 			Featured:    news.Featured,
@@ -241,6 +244,7 @@ func (ns *newsService) GetAllWithPagination(ctx context.Context, req response.Pa
 			Description: news.Description,
 			PublishedAt: news.PublishedAt.String(),
 			Location:    news.Location,
+			URL:         news.URL,
 			Status:      news.Status,
 			Views:       news.Views,
 			Featured:    news.Featured,
@@ -294,6 +298,7 @@ func (ns *newsService) GetFeatured(ctx context.Context, limit string) ([]dto.New
 			Description: news.Description,
 			PublishedAt: news.PublishedAt.String(),
 			Location:    news.Location,
+			URL:         news.URL,
 			Status:      news.Status,
 			Views:       news.Views,
 			Featured:    news.Featured,
@@ -333,6 +338,7 @@ func (ns *newsService) GetDetail(ctx context.Context, id string) (dto.NewsRespon
 		Description: news.Description,
 		PublishedAt: news.PublishedAt.String(),
 		Location:    news.Location,
+		URL:         news.URL,
 		Status:      news.Status,
 		Views:       news.Views + 1,
 		Featured:    news.Featured,
@@ -383,10 +389,15 @@ func (ns *newsService) Update(ctx context.Context, req dto.UpdateNewsRequest) (d
 	// handle location request
 	if req.Location != "" && req.Location != news.Location {
 		if len(req.Description) < 5 {
-			return dto.NewsResponse{}, dto.ErrDescriptionTooShort
+			return dto.NewsResponse{}, dto.ErrLocationTooShort
 		}
 
 		news.Location = req.Location
+	}
+
+	// handle url request
+	if req.URL != "" && req.URL != news.URL {
+		news.URL = req.URL
 	}
 
 	// handle status request
@@ -482,6 +493,7 @@ func (ns *newsService) Update(ctx context.Context, req dto.UpdateNewsRequest) (d
 		Description: news.Description,
 		PublishedAt: news.PublishedAt.String(),
 		Location:    news.Location,
+		URL:         news.URL,
 		Status:      news.Status,
 		Views:       news.Views,
 		Featured:    news.Featured,
@@ -537,6 +549,7 @@ func (ns *newsService) Delete(ctx context.Context, id string) (dto.NewsResponse,
 		Description: deletedNews.Description,
 		PublishedAt: deletedNews.PublishedAt.String(),
 		Location:    deletedNews.Location,
+		URL:         deletedNews.URL,
 		Status:      deletedNews.Status,
 		Views:       deletedNews.Views,
 		Featured:    deletedNews.Featured,
