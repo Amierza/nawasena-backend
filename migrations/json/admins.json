@@ -1,17 +1,17 @@
 [
   {
-    "id": "d7f3e1c2-4e27-4d83-91d3-8cda0b1b68a1",
-    "name": "admin1",
-    "email": "admin1@gmail.com",
-    "password": "adminnn1",
-    "role": "admin",
+    "id": "ebe3a6ac-48f8-413f-9c07-caad2b71976a",
+    "name": "super admin",
+    "email": "super-admin123@gmail.com",
+    "password": "super-admin123",
+    "role": "super admin",
     "phone_number": "081234567891"
   },
   {
-    "id": "9b6f1b48-fc88-43f0-b28e-56718efcf139",
-    "name": "admin2",
-    "email": "admin2@gmail.com",
-    "password": "adminnn2",
+    "id": "4a5a8f45-0f86-4798-974d-a8f9a08787de",
+    "name": "admin",
+    "email": "admin@gmail.com",
+    "password": "adminnnn20",
     "role": "admin",
     "phone_number": "081234567892"
   }
