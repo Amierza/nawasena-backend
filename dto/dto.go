@@ -654,6 +654,7 @@ type (
 		Description string               `json:"description"`
 		PublishedAt string               `json:"published_at"`
 		Location    string               `json:"location"`
+		URL         string               `json:"url"`
 		Status      string               `json:"status"` // Completed, Ongoing, Upcoming
 		Views       int                  `json:"views"`
 		Featured    bool                 `json:"featured"`
@@ -664,6 +665,7 @@ type (
 		Name        string   `json:"name"`
 		Description string   `json:"description"`
 		Location    string   `json:"location"`
+		URL         string   `json:"url"`
 		Status      string   `json:"status"` // Completed, Ongoing, Upcoming
 		Featured    bool     `json:"featured"`
 		CategoryID  string   `json:"category_id"`
@@ -674,6 +676,7 @@ type (
 		Name        string   `json:"name,omitempty"`
 		Description string   `json:"description,omitempty"`
 		Location    string   `json:"location,omitempty"`
+		URL         string   `json:"url,omitempty"`
 		Status      string   `json:"status,omitempty"` // Completed, Ongoing, Upcoming
 		Featured    bool     `json:"featured,omitempty"`
 		CategoryID  string   `json:"category_id,omitempty"`
