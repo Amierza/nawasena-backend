@@ -2,6 +2,4 @@
 storage/
 volumes/
 .vscode/
-assets/**
-!assets/
 /migrations/json/*.json
