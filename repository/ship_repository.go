@@ -66,7 +66,7 @@ func (pr *shipRepository) CreateImage(ctx context.Context, tx *gorm.DB, image *e
 		tx = pr.db
 	}
 
-	return tx.WithContext(ctx).Create(&image).Error
+	return tx.WithContext(ctx).Model(&entity.ShipImage{}).Create(&image).Error
 }
 
 // READ / GET
