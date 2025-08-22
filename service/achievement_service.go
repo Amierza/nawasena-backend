@@ -51,9 +51,6 @@ func (as *achievementService) Create(ctx context.Context, req dto.CreateAchievem
 	}
 
 	// validate required arrays
-	if len(req.Images) == 0 {
-		return dto.AchievementResponse{}, dto.ErrEmptyImages
-	}
 	if len(req.Team) == 0 {
 		return dto.AchievementResponse{}, dto.ErrEmptyTeam
 	}

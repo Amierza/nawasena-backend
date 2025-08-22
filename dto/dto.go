@@ -525,11 +525,11 @@ type (
 		Rank        string   `json:"rank" binding:"required"`
 		Competition string   `json:"competition" binding:"required"`
 		Team        []string `json:"team" binding:"required"`
-		Impact      string   `json:"impact" binding:"required"`
+		Impact      string   `json:"impact"`
 		VideoURL    string   `json:"video_url"`
 		Featured    bool     `json:"featured"`
-		Tags        []string `json:"tags" binding:"required"`
-		Images      []string `json:"images" binding:"required"`
+		Tags        []string `json:"tags"`
+		Images      []string `json:"images"`
 		CategoryID  string   `json:"category_id" binding:"required"`
 	}
 	UpdateAchievementRequest struct {
