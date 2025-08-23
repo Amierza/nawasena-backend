@@ -103,6 +103,13 @@ const (
 	MESSAGE_FAILED_UPDATE_PARTNER     = "failed update partner"
 	MESSAGE_FAILED_DELETE_PARTNER     = "failed delete partner"
 
+	// Flyer
+	MESSAGE_FAILED_CREATE_FLYER     = "failed create flyer"
+	MESSAGE_FAILED_GET_LIST_FLYER   = "failed get all flyer"
+	MESSAGE_FAILED_GET_DETAIL_FLYER = "failed get detail flyer"
+	MESSAGE_FAILED_UPDATE_FLYER     = "failed update flyer"
+	MESSAGE_FAILED_DELETE_FLYER     = "failed delete flyer"
+
 	// ====================================== Success ======================================
 	// File
 	MESSAGE_SUCCESS_UPLOAD_FILES = "success upload files"
@@ -181,6 +188,13 @@ const (
 	MESSAGE_SUCCESS_GET_DETAIL_PARTNER = "success get detail partner"
 	MESSAGE_SUCCESS_UPDATE_PARTNER     = "success update partner"
 	MESSAGE_SUCCESS_DELETE_PARTNER     = "success delete partner"
+
+	// Flyer
+	MESSAGE_SUCCESS_CREATE_FLYER     = "success create flyer"
+	MESSAGE_SUCCESS_GET_LIST_FLYER   = "success get all flyer"
+	MESSAGE_SUCCESS_GET_DETAIL_FLYER = "success get detail flyer"
+	MESSAGE_SUCCESS_UPDATE_FLYER     = "success update flyer"
+	MESSAGE_SUCCESS_DELETE_FLYER     = "success delete flyer"
 )
 
 var (
@@ -371,6 +385,18 @@ var (
 	ErrPartnerAlreadyExists        = errors.New("failed partner already exists")
 	ErrUpdatePartner               = errors.New("failed update partner")
 	ErrDeletePartnerByID           = errors.New("failed delete partner by id")
+
+	// Flyer
+	ErrGetFlyerByID              = errors.New("failed get flyer by id")
+	ErrGetFlyerImage             = errors.New("failed get flyer image")
+	ErrFlyerNotFound             = errors.New("flyer not found")
+	ErrCreateFlyer               = errors.New("failed create flyer")
+	ErrGetAllFlyer               = errors.New("failed get all flyer")
+	ErrGetAllFlyerNoPagination   = errors.New("failed get all flyer no pagination")
+	ErrGetAllFlyerWithPagination = errors.New("failed get all flyer with pagination")
+	ErrFlyerAlreadyExists        = errors.New("failed flyer already exists")
+	ErrUpdateFlyer               = errors.New("failed update flyer")
+	ErrDeleteFlyerByID           = errors.New("failed delete flyer by id")
 )
 
 // Authentiation for Admin
@@ -717,5 +743,31 @@ type (
 	PartnerPaginationRepositoryResponse struct {
 		response.PaginationResponse
 		Partners []entity.Partner
+	}
+)
+
+// Flyer
+type (
+	FlyerResponse struct {
+		ID    string `json:"id"`
+		Name  string `json:"name"`
+		Image string `json:"image"`
+	}
+	CreateFlyerRequest struct {
+		Name  string `json:"name"`
+		Image string `json:"image"`
+	}
+	UpdateFlyerRequest struct {
+		ID    string `json:"-"`
+		Name  string `json:"name,omitempty"`
+		Image string `json:"image,omitempty"`
+	}
+	FlyerPaginationResponse struct {
+		response.PaginationResponse
+		Data []FlyerResponse `json:"data"`
+	}
+	FlyerPaginationRepositoryResponse struct {
+		response.PaginationResponse
+		Flyers []entity.Flyer
 	}
 )
