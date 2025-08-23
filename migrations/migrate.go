@@ -23,6 +23,7 @@ func Migrate(db *gorm.DB) error {
 		&entity.NewsImage{},
 
 		&entity.Partner{},
+		&entity.Flyer{},
 
 		&entity.Position{},
 		&entity.Member{},
