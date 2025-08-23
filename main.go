@@ -90,6 +90,11 @@ func main() {
 		partnerRepo    = repository.NewPartnerRepository(db)
 		partnerService = service.NewPartnerService(partnerRepo, jwt)
 		partnerHandler = handler.NewPartnerHandler(partnerService)
+
+		// Flyer
+		flyerRepo    = repository.NewFlyerRepository(db)
+		flyerService = service.NewFlyerService(flyerRepo, jwt)
+		flyerHandler = handler.NewFlyerHandler(flyerService)
 	)
 
 	server := gin.Default()
@@ -107,6 +112,7 @@ func main() {
 	routes.NewsCategory(server, newsCategoryHandler, jwt)
 	routes.News(server, newsHandler, jwt)
 	routes.Partner(server, partnerHandler, jwt)
+	routes.Flyer(server, flyerHandler, jwt)
 
 	server.Static("/assets", "./assets")
 

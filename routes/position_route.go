@@ -13,7 +13,7 @@ func Position(route *gin.Engine, positionHandler handler.IPositionHandler, jwtSe
 		routes.GET("", positionHandler.GetAll)
 		routes.GET("/:id", positionHandler.GetDetail)
 
-		routes.Use(middleware.Authentication(jwtService))
+		routes.Use(middleware.Authentication(jwtService), middleware.RouteAccessControl(jwtService))
 		{
 			routes.POST("", positionHandler.Create)
 			routes.PATCH("/:id", positionHandler.Update)
