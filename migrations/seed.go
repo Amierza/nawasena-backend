@@ -1,7 +1,6 @@
 package migrations
 
 import (
-	"github.com/Amierza/nawasena-backend/entity"
 	"gorm.io/gorm"
 )
 
@@ -21,7 +20,7 @@ func Seed(db *gorm.DB) error {
 	// 	return err
 	// }
 
-	// err := SeedFromJSON[entity.Achievement](db, "./migrations/json/achievements.json", entity.Achievement{}, "Name", "Year", "Description")
+	// err = SeedFromJSON[entity.Achievement](db, "./migrations/json/achievements.json", entity.Achievement{}, "Name", "Year", "Description")
 	// if err != nil {
 	// 	return err
 	// }
@@ -31,15 +30,15 @@ func Seed(db *gorm.DB) error {
 	// 	return err
 	// }
 
-	// err := SeedFromJSON[entity.Partner](db, "./migrations/json/partners.json", entity.Partner{}, "Name")
+	// err = SeedFromJSON[entity.Partner](db, "./migrations/json/partners.json", entity.Partner{}, "Name")
 	// if err != nil {
 	// 	return err
 	// }
 
-	err := SeedFromJSON[entity.Ship](db, "./migrations/json/ships.json", entity.Ship{}, "Name")
-	if err != nil {
-		return err
-	}
+	// err := SeedFromJSON[entity.Ship](db, "./migrations/json/ships.json", entity.Ship{}, "Name")
+	// if err != nil {
+	// 	return err
+	// }
 
 	return nil
 }

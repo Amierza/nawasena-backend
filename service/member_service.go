@@ -2,7 +2,7 @@ package service
 
 import (
 	"context"
-	"strings"
+	"net/url"
 
 	"github.com/Amierza/nawasena-backend/dto"
 	"github.com/Amierza/nawasena-backend/entity"
@@ -23,15 +23,17 @@ type (
 	}
 
 	memberService struct {
-		memberRepo repository.IMemberRepository
-		jwt        jwt.IJWT
+		memberRepo  repository.IMemberRepository
+		fileService IFileService
+		jwt         jwt.IJWT
 	}
 )
 
-func NewMemberService(memberRepo repository.IMemberRepository, jwt jwt.IJWT) *memberService {
+func NewMemberService(memberRepo repository.IMemberRepository, fileService IFileService, jwt jwt.IJWT) *memberService {
 	return &memberService{
-		memberRepo: memberRepo,
-		jwt:        jwt,
+		memberRepo:  memberRepo,
+		fileService: fileService,
+		jwt:         jwt,
 	}
 }
 
@@ -48,7 +50,8 @@ func (ms *memberService) Create(ctx context.Context, req dto.CreateMemberRequest
 	if req.Image == "" {
 		return dto.MemberResponse{}, dto.ErrEmptyImage
 	}
-	if !strings.HasPrefix(req.Image, "assets/") {
+	_, err := url.ParseRequestURI(req.Image)
+	if err != nil {
 		return dto.MemberResponse{}, dto.ErrFormatImage
 	}
 
@@ -205,7 +208,8 @@ func (ms *memberService) Update(ctx context.Context, req dto.UpdateMemberRequest
 
 	// handle image request
 	if req.Image != "" && req.Image != member.Image {
-		if !strings.HasPrefix(req.Image, "assets/") {
+		_, err := url.ParseRequestURI(req.Image)
+		if err != nil {
 			return dto.MemberResponse{}, dto.ErrFormatImage
 		}
 

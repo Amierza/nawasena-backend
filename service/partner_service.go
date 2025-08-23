@@ -2,9 +2,6 @@ package service
 
 import (
 	"context"
-	"os"
-	"path/filepath"
-	"strings"
 
 	"github.com/Amierza/nawasena-backend/dto"
 	"github.com/Amierza/nawasena-backend/entity"
@@ -158,22 +155,10 @@ func (as *partnerService) Update(ctx context.Context, req dto.UpdatePartnerReque
 		partner.Name = req.Name
 	}
 
-	// handle image request
-	oldImage := partner.Image
-	if req.Image != "" && req.Image != partner.Image {
-		partner.Image = req.Image
-	}
-
 	err = as.partnerRepo.RunInTransaction(ctx, func(txRepo repository.IPartnerRepository) error {
 		// update partner
 		if err := txRepo.Update(ctx, nil, partner); err != nil {
 			return dto.ErrUpdatePartner
-		}
-
-		name := strings.TrimPrefix(oldImage, "assets/")
-		path := filepath.Join("assets", name)
-		if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
-			return dto.ErrDeleteOldImage
 		}
 
 		return nil
@@ -199,13 +184,6 @@ func (as *partnerService) Delete(ctx context.Context, id string) (dto.PartnerRes
 	}
 
 	err = as.partnerRepo.RunInTransaction(ctx, func(txRepo repository.IPartnerRepository) error {
-		// Delete Partner Image
-		name := strings.TrimPrefix(deletedPartner.Image, "assets/")
-		path := filepath.Join("assets", name)
-		if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
-			return dto.ErrDeleteOldImage
-		}
-
 		// Delete Partner
 		err = as.partnerRepo.DeleteByID(ctx, nil, id)
 		if err != nil {

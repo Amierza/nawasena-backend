@@ -27,6 +27,7 @@ const (
 	MESSAGE_FAILED_NO_FILES_UPLOADED    = "failed no files uploaded"
 	MESSAGE_FAILED_FILES_IS_EMPTY       = "failed files is empty"
 	MESSAGE_FAILED_UPLOAD_FILES         = "failed upload files"
+	MESSAGE_FAILED_UPLOAD_FILE          = "failed upload file"
 
 	// Authentication
 	MESSAGE_FAILED_LOGIN_USER    = "failed login user"
@@ -105,6 +106,7 @@ const (
 	// ====================================== Success ======================================
 	// File
 	MESSAGE_SUCCESS_UPLOAD_FILES = "success upload files"
+	MESSAGE_SUCCESS_UPLOAD_FILE  = "success upload file"
 
 	// Authentication
 	MESSAGE_SUCCESS_LOGIN_USER    = "success login user"

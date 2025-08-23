@@ -45,9 +45,9 @@ func getSecretKey() string {
 	return secretKey
 }
 
-func (j *JWT) GenerateToken(userID, roleName string) (string, string, error) {
+func (j *JWT) GenerateToken(adminID, roleName string) (string, string, error) {
 	accessClaims := jwtCustomClaim{
-		userID,
+		adminID,
 		roleName,
 		jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Second * 300)),
@@ -63,7 +63,7 @@ func (j *JWT) GenerateToken(userID, roleName string) (string, string, error) {
 	}
 
 	refreshClaims := jwtCustomClaim{
-		userID,
+		adminID,
 		roleName,
 		jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Second * 3600 * 24 * 7)),
@@ -109,7 +109,7 @@ func (j *JWT) GetAdminIDByToken(tokenString string) (string, error) {
 		return "", dto.ErrTokenInvalid
 	}
 
-	userID := fmt.Sprintf("%v", claims["user_id"])
+	userID := fmt.Sprintf("%v", claims["admin_id"])
 
 	return userID, nil
 }

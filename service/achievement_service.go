@@ -2,10 +2,7 @@ package service
 
 import (
 	"context"
-	"os"
-	"path/filepath"
 	"strconv"
-	"strings"
 
 	"github.com/Amierza/nawasena-backend/dto"
 	"github.com/Amierza/nawasena-backend/entity"
@@ -428,19 +425,7 @@ func (as *achievementService) Update(ctx context.Context, req dto.UpdateAchievem
 
 		// handle new image
 		if len(req.Name) > 0 {
-			// check request images
-			oldImages, err := txRepo.GetImagesByID(ctx, nil, achievement.ID.String())
-			if err != nil {
-				return dto.ErrGetAchievementImages
-			}
-
 			// Delete Existing Achievement Image
-			// in assets
-			for _, img := range oldImages {
-				if err := os.Remove(img.Name); err != nil && !os.IsNotExist(err) {
-					return dto.ErrDeleteOldImage
-				}
-			}
 			// in db
 			if err := txRepo.DeleteImagesByID(ctx, nil, achievement.ID.String()); err != nil {
 				return dto.ErrDeleteAchievementImageByAchievementID
@@ -492,17 +477,6 @@ func (as *achievementService) Delete(ctx context.Context, id string) (dto.Achiev
 
 	err = as.achievementRepo.RunInTransaction(ctx, func(txRepo repository.IAchievementRepository) error {
 		// Delete Achievement Images
-		oldAchievementImages, err := txRepo.GetImagesByID(ctx, nil, id)
-		if err != nil {
-			return dto.ErrGetAchievementImages
-		}
-		for _, img := range oldAchievementImages {
-			name := strings.TrimPrefix(img.Name, "assets/")
-			path := filepath.Join("assets", name)
-			if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
-				return dto.ErrDeleteOldImage
-			}
-		}
 		if err := txRepo.DeleteImagesByID(ctx, nil, id); err != nil {
 			return dto.ErrDeleteAchievementImageByAchievementID
 		}

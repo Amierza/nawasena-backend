@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"mime/multipart"
 	"net/http"
 
 	"github.com/Amierza/nawasena-backend/dto"
@@ -11,7 +12,7 @@ import (
 
 type (
 	IFileHandler interface {
-		UploadFiles(ctx *gin.Context)
+		Upload(ctx *gin.Context)
 	}
 
 	fileHandler struct {
@@ -25,28 +26,44 @@ func NewFileHandler(fileService service.IFileService) *fileHandler {
 	}
 }
 
-func (fh *fileHandler) UploadFiles(ctx *gin.Context) {
+func (fh *fileHandler) Upload(ctx *gin.Context) {
+	// coba ambil semua files dari multipart form
 	form, err := ctx.MultipartForm()
-	if err != nil {
-		res := response.BuildResponseFailed(dto.MESSAGE_FAILED_PARSE_MULTIPART_FORM, err.Error(), nil)
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
-		return
+	var files []*multipart.FileHeader
+
+	if err == nil && form.File != nil && len(form.File["files"]) > 0 {
+		// kalau user upload banyak file (key = "files")
+		files = form.File["files"]
+	} else {
+		// kalau user upload single file (key = "file")
+		file, err := ctx.FormFile("file")
+		if err != nil {
+			res := response.BuildResponseFailed(dto.MESSAGE_FAILED_NO_FILES_UPLOADED, "no file(s) uploaded", nil)
+			ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
+			return
+		}
+		files = []*multipart.FileHeader{file}
 	}
 
-	files := form.File["files"]
-	if len(files) == 0 {
-		res := response.BuildResponseFailed(dto.MESSAGE_FAILED_FILES_IS_EMPTY, dto.MESSAGE_FAILED_NO_FILES_UPLOADED, nil)
-		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
-		return
-	}
+	// ambil folder dari query param (optional, default = "general")
+	folder := ctx.DefaultQuery("folder", "")
 
-	uploadedURLs, err := fh.fileService.UploadFiles(ctx, files)
+	// call service
+	uploadedURLs, err := fh.fileService.Upload(ctx, files, folder)
 	if err != nil {
 		res := response.BuildResponseFailed(dto.MESSAGE_FAILED_UPLOAD_FILES, err.Error(), nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
 		return
 	}
 
+	// kalau hanya 1 file → balikin string saja
+	if len(uploadedURLs) == 1 {
+		res := response.BuildResponseSuccess(dto.MESSAGE_SUCCESS_UPLOAD_FILE, uploadedURLs[0])
+		ctx.JSON(http.StatusOK, res)
+		return
+	}
+
+	// kalau banyak file → balikin array
 	res := response.BuildResponseSuccess(dto.MESSAGE_SUCCESS_UPLOAD_FILES, uploadedURLs)
 	ctx.JSON(http.StatusOK, res)
 }

@@ -2,10 +2,7 @@ package service
 
 import (
 	"context"
-	"os"
-	"path/filepath"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/Amierza/nawasena-backend/dto"
@@ -139,33 +136,10 @@ func (ns *newsService) Create(ctx context.Context, req dto.CreateNewsRequest) (d
 			return dto.ErrCreateNews
 		}
 
-		// handle new image
-		if len(req.Name) > 0 {
-			// check request images
-			oldImages, err := txRepo.GetImagesByID(ctx, nil, news.ID.String())
-			if err != nil {
-				return dto.ErrGetNewsImages
-			}
-
-			// Delete Existing News Image
-			// in assets
-			for _, img := range oldImages {
-				name := strings.TrimPrefix(img.Name, "assets/")
-				path := filepath.Join("assets", name)
-				if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
-					return dto.ErrDeleteOldImage
-				}
-			}
-			// in db
-			if err := txRepo.DeleteImagesByID(ctx, nil, news.ID.String()); err != nil {
-				return dto.ErrDeleteNewsImageByNewsID
-			}
-
-			// Create new news images
-			for _, img := range newsImages {
-				if err := txRepo.CreateImage(ctx, nil, img); err != nil {
-					return dto.ErrCreateNewsImage
-				}
+		// Create new news images
+		for _, img := range newsImages {
+			if err := txRepo.CreateImage(ctx, nil, img); err != nil {
+				return dto.ErrCreateNewsImage
 			}
 		}
 
@@ -455,20 +429,6 @@ func (ns *newsService) Update(ctx context.Context, req dto.UpdateNewsRequest) (d
 
 		// handle new image
 		if len(req.Name) > 0 {
-			// check request images
-			oldImages, err := txRepo.GetImagesByID(ctx, nil, news.ID.String())
-			if err != nil {
-				return dto.ErrGetNewsImages
-			}
-
-			// Delete Existing News Image
-			// in assets
-			for _, img := range oldImages {
-				if err := os.Remove(img.Name); err != nil && !os.IsNotExist(err) {
-					return dto.ErrDeleteOldImage
-				}
-			}
-			// in db
 			if err := txRepo.DeleteImagesByID(ctx, nil, news.ID.String()); err != nil {
 				return dto.ErrDeleteNewsImageByNewsID
 			}
@@ -515,18 +475,6 @@ func (ns *newsService) Delete(ctx context.Context, id string) (dto.NewsResponse,
 	}
 
 	err = ns.newsRepo.RunInTransaction(ctx, func(txRepo repository.INewsRepository) error {
-		// Delete News Images
-		oldNewsImages, err := txRepo.GetImagesByID(ctx, nil, id)
-		if err != nil {
-			return dto.ErrGetNewsImages
-		}
-		for _, img := range oldNewsImages {
-			name := strings.TrimPrefix(img.Name, "assets/")
-			path := filepath.Join("assets", name)
-			if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
-				return dto.ErrDeleteOldImage
-			}
-		}
 		if err := txRepo.DeleteImagesByID(ctx, nil, id); err != nil {
 			return dto.ErrDeleteNewsImageByNewsID
 		}

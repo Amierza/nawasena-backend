@@ -3,6 +3,7 @@ module github.com/Amierza/nawasena-backend
 go 1.23.2
 
 require (
+	github.com/supabase-community/storage-go v0.7.0
 	golang.org/x/crypto v0.32.0
 	gorm.io/gorm v1.30.0
 )

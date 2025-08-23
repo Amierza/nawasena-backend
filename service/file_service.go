@@ -3,92 +3,81 @@ package service
 import (
 	"context"
 	"fmt"
-	"io"
 	"mime/multipart"
-	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/Amierza/nawasena-backend/dto"
 	"github.com/google/uuid"
+	storage_go "github.com/supabase-community/storage-go"
 )
 
 type (
 	IFileService interface {
-		// public function
-		UploadFiles(ctx context.Context, files []*multipart.FileHeader) ([]string, error)
-		// private / helper function
-		saveUploadedFile(file *multipart.FileHeader, savePath string) error
-		createFile(path string) (*os.File, error)
-		copyFile(dst *os.File, src multipart.File) (int64, error)
+		Upload(ctx context.Context, files []*multipart.FileHeader, folder string) ([]string, error)
 	}
 
 	fileService struct {
+		client    *storage_go.Client
+		bucket    string
+		publicURL string
 	}
 )
 
-func NewFileService() *fileService {
-	return &fileService{}
+func NewFileService(supabaseUrl, supabaseKey, bucket string) *fileService {
+	client := storage_go.NewClient(fmt.Sprintf("%s/storage/v1", supabaseUrl), supabaseKey, nil)
+	publicURL := fmt.Sprintf("%s/storage/v1/object/public/%s/", supabaseUrl, bucket)
+	return &fileService{
+		client:    client,
+		bucket:    bucket,
+		publicURL: publicURL,
+	}
 }
 
-func (fs *fileService) UploadFiles(ctx context.Context, files []*multipart.FileHeader) ([]string, error) {
+var allowedExt = map[string]bool{
+	".jpg":  true,
+	".jpeg": true,
+	".png":  true,
+}
+
+// Upload bisa handle single atau multiple file
+func (fs *fileService) Upload(ctx context.Context, files []*multipart.FileHeader, folder string) ([]string, error) {
 	if len(files) == 0 {
 		return nil, dto.ErrNoFilesUploaded
 	}
 
-	var uploadedPaths []string
+	var uploadedURLs []string
 	for _, file := range files {
-		// Validasi extension
-		ext := filepath.Ext(file.Filename)
-		allowedExt := map[string]bool{
-			".jpg":  true,
-			".jpeg": true,
-			".png":  true,
-		}
-		if !allowedExt[strings.ToLower(ext)] {
+		ext := strings.ToLower(filepath.Ext(file.Filename))
+		if !allowedExt[ext] {
 			return nil, dto.ErrInvalidFileType
 		}
 
-		// Generate unique file name
 		newFileName := fmt.Sprintf("%s%s", uuid.New().String(), ext)
-		savePath := filepath.Join("assets/", newFileName)
-		if err := os.MkdirAll(filepath.Dir(savePath), os.ModePerm); err != nil {
-			return nil, dto.ErrCreateFolderAssets
+
+		// kalau folder tidak kosong → simpan di dalam folder
+		storagePath := newFileName
+		if folder != "" {
+			storagePath = filepath.Join(folder, newFileName)
 		}
 
-		// Simpan file (local)
-		if err := fs.saveUploadedFile(file, savePath); err != nil {
-			return nil, dto.ErrSaveFile
+		src, err := file.Open()
+		if err != nil {
+			return nil, err
+		}
+		defer src.Close()
+
+		contentType := file.Header.Get("Content-Type")
+
+		_, err = fs.client.UploadFile(fs.bucket, storagePath, src, storage_go.FileOptions{
+			ContentType: &contentType,
+		})
+		if err != nil {
+			return nil, err
 		}
 
-		uploadedPaths = append(uploadedPaths, savePath)
+		uploadedURLs = append(uploadedURLs, fs.publicURL+storagePath)
 	}
 
-	return uploadedPaths, nil
-}
-
-func (fs *fileService) saveUploadedFile(file *multipart.FileHeader, savePath string) error {
-	src, err := file.Open()
-	if err != nil {
-		return err
-	}
-	defer src.Close()
-
-	dst, err := fs.createFile(savePath)
-	if err != nil {
-		return err
-	}
-	defer dst.Close()
-
-	_, err = fs.copyFile(dst, src)
-	return err
-}
-
-// ini nanti kita ganti kalau mau langsung ke S3
-func (fs *fileService) createFile(path string) (*os.File, error) {
-	return os.Create(path)
-}
-
-func (fs *fileService) copyFile(dst *os.File, src multipart.File) (int64, error) {
-	return io.Copy(dst, src)
+	return uploadedURLs, nil
 }
