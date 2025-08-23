@@ -24,6 +24,11 @@ func main() {
 		return
 	}
 
+	// ambil dari ENV
+	supabaseUrl := os.Getenv("SUPABASE_URL")
+	supabaseKey := os.Getenv("SUPABASE_KEY")
+	bucket := "upload"
+
 	var (
 		jwt = jwt.NewJWT()
 
@@ -33,7 +38,7 @@ func main() {
 		authHandler = handler.NewAuthHandler(authService)
 
 		// Files
-		fileService = service.NewFileService()
+		fileService = service.NewFileService(supabaseUrl, supabaseKey, bucket)
 		fileHandler = handler.NewFileHandler(fileService)
 
 		// Admin
@@ -48,7 +53,7 @@ func main() {
 
 		// Member
 		memberRepo    = repository.NewMemberRepository(db)
-		memberService = service.NewMemberService(memberRepo, jwt)
+		memberService = service.NewMemberService(memberRepo, fileService, jwt)
 		memberHandler = handler.NewMemberHandler(memberService)
 
 		// Achievement Category

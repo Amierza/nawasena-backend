@@ -2,9 +2,6 @@ package service
 
 import (
 	"context"
-	"os"
-	"path/filepath"
-	"strings"
 
 	"github.com/Amierza/nawasena-backend/dto"
 	"github.com/Amierza/nawasena-backend/entity"
@@ -97,33 +94,10 @@ func (as *shipService) Create(ctx context.Context, req dto.CreateShipRequest) (d
 			return dto.ErrCreateShip
 		}
 
-		// handle new image
-		if len(req.Name) > 0 {
-			// check request images
-			oldImages, err := txRepo.GetImagesByID(ctx, nil, ship.ID.String())
-			if err != nil {
-				return dto.ErrGetShipImages
-			}
-
-			// Delete Existing Ship Image
-			// in assets
-			for _, img := range oldImages {
-				name := strings.TrimPrefix(img.Name, "assets/")
-				path := filepath.Join("assets", name)
-				if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
-					return dto.ErrDeleteOldImage
-				}
-			}
-			// in db
-			if err := txRepo.DeleteImagesByID(ctx, nil, ship.ID.String()); err != nil {
-				return dto.ErrDeleteShipImageByShipID
-			}
-
-			// Create new ship images
-			for _, img := range shipImages {
-				if err := txRepo.CreateImage(ctx, nil, img); err != nil {
-					return dto.ErrCreateShipImage
-				}
+		// Create new ship images
+		for _, img := range shipImages {
+			if err := txRepo.CreateImage(ctx, nil, img); err != nil {
+				return dto.ErrCreateShipImage
 			}
 		}
 
@@ -284,19 +258,7 @@ func (as *shipService) Update(ctx context.Context, req dto.UpdateShipRequest) (d
 
 		// handle new image
 		if len(req.Name) > 0 {
-			// check request images
-			oldImages, err := txRepo.GetImagesByID(ctx, nil, ship.ID.String())
-			if err != nil {
-				return dto.ErrGetShipImages
-			}
-
 			// Delete Existing Ship Image
-			// in assets
-			for _, img := range oldImages {
-				if err := os.Remove(img.Name); err != nil && !os.IsNotExist(err) {
-					return dto.ErrDeleteOldImage
-				}
-			}
 			// in db
 			if err := txRepo.DeleteImagesByID(ctx, nil, ship.ID.String()); err != nil {
 				return dto.ErrDeleteShipImageByShipID
@@ -335,17 +297,6 @@ func (as *shipService) Delete(ctx context.Context, id string) (dto.ShipResponse,
 
 	err = as.shipRepo.RunInTransaction(ctx, func(txRepo repository.IShipRepository) error {
 		// Delete Ship Images
-		oldShipImages, err := txRepo.GetImagesByID(ctx, nil, id)
-		if err != nil {
-			return dto.ErrGetShipImages
-		}
-		for _, img := range oldShipImages {
-			name := strings.TrimPrefix(img.Name, "assets/")
-			path := filepath.Join("assets", name)
-			if err := os.Remove(path); err != nil && !os.IsNotExist(err) {
-				return dto.ErrDeleteOldImage
-			}
-		}
 		if err := txRepo.DeleteImagesByID(ctx, nil, id); err != nil {
 			return dto.ErrDeleteShipImageByShipID
 		}
