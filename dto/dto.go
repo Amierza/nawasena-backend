@@ -464,7 +464,7 @@ type (
 	UpdatePositionRequest struct {
 		ID     string `json:"-"`
 		Name   string `json:"name,omitempty"`
-		IsTech bool   `json:"is_tech,omitempty"`
+		IsTech *bool  `json:"is_tech,omitempty"`
 	}
 	PositionPaginationResponse struct {
 		response.PaginationResponse

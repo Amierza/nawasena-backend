@@ -151,7 +151,10 @@ func (pr *positionRepository) Update(ctx context.Context, tx *gorm.DB, position 
 		tx = pr.db
 	}
 
-	return tx.WithContext(ctx).Where("id = ?", position.ID).Updates(&position).Error
+	return tx.WithContext(ctx).Model(&entity.Position{}).
+		Where("id = ?", position.ID).
+		Select("Name", "IsTech").
+		Updates(position).Error
 }
 
 // DELETE / DELETE
