@@ -102,8 +102,9 @@ func (ms *memberService) Create(ctx context.Context, req dto.CreateMemberRequest
 		Major:      member.Major,
 		Generation: member.Generation,
 		Position: dto.PositionResponse{
-			ID:   position.ID.String(),
-			Name: position.Name,
+			ID:     position.ID.String(),
+			Name:   position.Name,
+			IsTech: position.IsTech,
 		},
 	}, nil
 }
@@ -123,8 +124,9 @@ func (ms *memberService) GetAll(ctx context.Context) ([]dto.MemberResponse, erro
 			Major:      member.Major,
 			Generation: member.Generation,
 			Position: dto.PositionResponse{
-				ID:   member.Position.ID.String(),
-				Name: member.Position.Name,
+				ID:     member.Position.ID.String(),
+				Name:   member.Position.Name,
+				IsTech: member.Position.IsTech,
 			},
 		}
 
@@ -149,8 +151,9 @@ func (ms *memberService) GetAllWithPagination(ctx context.Context, req response.
 			Major:      member.Major,
 			Generation: member.Generation,
 			Position: dto.PositionResponse{
-				ID:   member.Position.ID.String(),
-				Name: member.Position.Name,
+				ID:     member.Position.ID.String(),
+				Name:   member.Position.Name,
+				IsTech: member.Position.IsTech,
 			},
 		}
 
@@ -181,8 +184,9 @@ func (ms *memberService) GetDetail(ctx context.Context, id string) (dto.MemberRe
 		Major:      member.Major,
 		Generation: member.Generation,
 		Position: dto.PositionResponse{
-			ID:   member.Position.ID.String(),
-			Name: member.Position.Name,
+			ID:     member.Position.ID.String(),
+			Name:   member.Position.Name,
+			IsTech: member.Position.IsTech,
 		},
 	}, nil
 }
@@ -257,8 +261,9 @@ func (ms *memberService) Update(ctx context.Context, req dto.UpdateMemberRequest
 		Major:      member.Major,
 		Generation: member.Generation,
 		Position: dto.PositionResponse{
-			ID:   member.Position.ID.String(),
-			Name: member.Position.Name,
+			ID:     member.Position.ID.String(),
+			Name:   member.Position.Name,
+			IsTech: member.Position.IsTech,
 		},
 	}
 
@@ -286,8 +291,9 @@ func (ms *memberService) Delete(ctx context.Context, id string) (dto.MemberRespo
 		Major:      deletedMember.Major,
 		Generation: deletedMember.Generation,
 		Position: dto.PositionResponse{
-			ID:   deletedMember.Position.ID.String(),
-			Name: deletedMember.Position.Name,
+			ID:     deletedMember.Position.ID.String(),
+			Name:   deletedMember.Position.Name,
+			IsTech: deletedMember.Position.IsTech,
 		},
 	}
 
