@@ -148,7 +148,9 @@ func (ps *positionService) Update(ctx context.Context, req dto.UpdatePositionReq
 		position.Name = req.Name
 	}
 
-	position.IsTech = req.IsTech
+	if req.IsTech != nil {
+		position.IsTech = *req.IsTech
+	}
 
 	if err := ps.positionRepo.Update(ctx, nil, position); err != nil {
 		return dto.PositionResponse{}, dto.ErrUpdatePosition
