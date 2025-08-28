@@ -453,15 +453,18 @@ type (
 // Position
 type (
 	PositionResponse struct {
-		ID   string `json:"id"`
-		Name string `json:"name"`
+		ID     string `json:"id"`
+		Name   string `json:"name"`
+		IsTech bool   `json:"is_tech"`
 	}
 	CreatePositionRequest struct {
-		Name string `json:"name"`
+		Name   string `json:"name"`
+		IsTech bool   `json:"is_tech"`
 	}
 	UpdatePositionRequest struct {
-		ID   string `json:"-"`
-		Name string `json:"name,omitempty"`
+		ID     string `json:"-"`
+		Name   string `json:"name,omitempty"`
+		IsTech bool   `json:"is_tech,omitempty"`
 	}
 	PositionPaginationResponse struct {
 		response.PaginationResponse

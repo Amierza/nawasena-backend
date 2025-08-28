@@ -49,8 +49,9 @@ func (ps *positionService) Create(ctx context.Context, req dto.CreatePositionReq
 
 	id := uuid.New()
 	position := &entity.Position{
-		ID:   id,
-		Name: req.Name,
+		ID:     id,
+		Name:   req.Name,
+		IsTech: req.IsTech,
 	}
 
 	err := ps.positionRepo.Create(ctx, nil, position)
@@ -59,8 +60,9 @@ func (ps *positionService) Create(ctx context.Context, req dto.CreatePositionReq
 	}
 
 	return dto.PositionResponse{
-		ID:   position.ID.String(),
-		Name: position.Name,
+		ID:     position.ID.String(),
+		Name:   position.Name,
+		IsTech: position.IsTech,
 	}, nil
 }
 
@@ -73,8 +75,9 @@ func (ps *positionService) GetAll(ctx context.Context) ([]dto.PositionResponse, 
 	var datas []dto.PositionResponse
 	for _, position := range positions {
 		data := dto.PositionResponse{
-			ID:   position.ID.String(),
-			Name: position.Name,
+			ID:     position.ID.String(),
+			Name:   position.Name,
+			IsTech: position.IsTech,
 		}
 
 		datas = append(datas, data)
@@ -92,8 +95,9 @@ func (ps *positionService) GetAllWithPagination(ctx context.Context, req respons
 	var datas []dto.PositionResponse
 	for _, position := range dataWithPaginate.Positions {
 		data := dto.PositionResponse{
-			ID:   position.ID.String(),
-			Name: position.Name,
+			ID:     position.ID.String(),
+			Name:   position.Name,
+			IsTech: position.IsTech,
 		}
 
 		datas = append(datas, data)
@@ -117,8 +121,9 @@ func (ps *positionService) GetDetail(ctx context.Context, id string) (dto.Positi
 	}
 
 	return dto.PositionResponse{
-		ID:   position.ID.String(),
-		Name: position.Name,
+		ID:     position.ID.String(),
+		Name:   position.Name,
+		IsTech: position.IsTech,
 	}, nil
 }
 
@@ -143,13 +148,16 @@ func (ps *positionService) Update(ctx context.Context, req dto.UpdatePositionReq
 		position.Name = req.Name
 	}
 
+	position.IsTech = req.IsTech
+
 	if err := ps.positionRepo.Update(ctx, nil, position); err != nil {
 		return dto.PositionResponse{}, dto.ErrUpdatePosition
 	}
 
 	res := dto.PositionResponse{
-		ID:   position.ID.String(),
-		Name: position.Name,
+		ID:     position.ID.String(),
+		Name:   position.Name,
+		IsTech: position.IsTech,
 	}
 
 	return res, nil
@@ -170,8 +178,9 @@ func (ps *positionService) Delete(ctx context.Context, id string) (dto.PositionR
 	}
 
 	res := dto.PositionResponse{
-		ID:   deletedPosition.ID.String(),
-		Name: deletedPosition.Name,
+		ID:     deletedPosition.ID.String(),
+		Name:   deletedPosition.Name,
+		IsTech: deletedPosition.IsTech,
 	}
 
 	return res, nil
