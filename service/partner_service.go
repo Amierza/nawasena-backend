@@ -155,6 +155,11 @@ func (as *partnerService) Update(ctx context.Context, req dto.UpdatePartnerReque
 		partner.Name = req.Name
 	}
 
+	// handle name request
+	if req.Image != "" && req.Image != partner.Image {
+		partner.Image = req.Image
+	}
+
 	err = as.partnerRepo.RunInTransaction(ctx, func(txRepo repository.IPartnerRepository) error {
 		// update partner
 		if err := txRepo.Update(ctx, nil, partner); err != nil {
