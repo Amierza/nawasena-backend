@@ -24,11 +24,6 @@ func main() {
 		return
 	}
 
-	// ambil dari ENV
-	supabaseUrl := os.Getenv("SUPABASE_URL")
-	supabaseKey := os.Getenv("SUPABASE_KEY")
-	bucket := "upload"
-
 	var (
 		jwt = jwt.NewJWT()
 
@@ -38,7 +33,7 @@ func main() {
 		authHandler = handler.NewAuthHandler(authService)
 
 		// Files
-		fileService = service.NewFileService(supabaseUrl, supabaseKey, bucket)
+		fileService = service.NewFileService()
 		fileHandler = handler.NewFileHandler(fileService)
 
 		// Admin
@@ -114,7 +109,7 @@ func main() {
 	routes.Partner(server, partnerHandler, jwt)
 	routes.Flyer(server, flyerHandler, jwt)
 
-	server.Static("/assets", "./assets")
+	server.Static("/uploads", "./uploads")
 
 	port := os.Getenv("PORT")
 	if port == "" {
