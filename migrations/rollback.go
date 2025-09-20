@@ -25,6 +25,7 @@ func Rollback(db *gorm.DB) error {
 
 		&entity.AchievementImage{},
 		&entity.Achievement{},
+		&entity.AchievementCategory{},
 
 		&entity.Admin{},
 	}

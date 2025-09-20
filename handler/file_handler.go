@@ -45,11 +45,8 @@ func (fh *fileHandler) Upload(ctx *gin.Context) {
 		files = []*multipart.FileHeader{file}
 	}
 
-	// ambil folder dari query param (optional, default = "general")
-	folder := ctx.DefaultQuery("folder", "")
-
 	// call service
-	uploadedURLs, err := fh.fileService.Upload(ctx, files, folder)
+	uploadedURLs, err := fh.fileService.Upload(ctx, files)
 	if err != nil {
 		res := response.BuildResponseFailed(dto.MESSAGE_FAILED_UPLOAD_FILES, err.Error(), nil)
 		ctx.AbortWithStatusJSON(http.StatusBadRequest, res)
