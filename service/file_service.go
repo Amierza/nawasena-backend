@@ -62,7 +62,7 @@ func (fs *fileService) Upload(ctx context.Context, files []*multipart.FileHeader
 			return nil, dto.ErrSaveFile
 		}
 
-		uploadedPaths = append(uploadedPaths, savePath)
+		uploadedPaths = append(uploadedPaths, newFileName)
 	}
 
 	return uploadedPaths, nil
